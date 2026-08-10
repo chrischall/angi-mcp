@@ -1,0 +1,27 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "angi-mcp",
+  "owner": {
+    "name": "Chris Hall",
+    "email": "chris.c.hall@gmail.com"
+  },
+  "metadata": {
+    "description": "MCP server for Angi — find home-service pros by trade and city, read ratings, reviews and pro profiles. Angi serves its pages only to a real browser, so requests route through the user's own angi.com tab via the fetchproxy browser extension, reusing their existing session. The trade/city taxonomy is read from Angi's public sitemaps directly.",
+    "version": "0.0.0"
+  },
+  "plugins": [
+    {
+      "name": "angi-mcp",
+      "displayName": "Angi",
+      "source": "./",
+      "description": "MCP server for Angi — find home-service pros, read ratings and reviews",
+      "version": "0.0.0",
+      "author": { "name": "Chris Hall" },
+      "homepage": "https://github.com/chrischall/angi-mcp",
+      "repository": "https://github.com/chrischall/angi-mcp",
+      "license": "MIT",
+      "keywords": ["angi", "home-services", "contractors", "reviews", "mcp"],
+      "category": "productivity"
+    }
+  ]
+}

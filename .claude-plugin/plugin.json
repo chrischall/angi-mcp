@@ -1,0 +1,16 @@
+{
+  "name": "angi-mcp",
+  "displayName": "Angi",
+  "version": "0.0.0",
+  "description": "Angi home-services access for Claude — find pros by trade and city, read ratings, reviews and pro profiles",
+  "author": {
+    "name": "Chris Hall",
+    "email": "chris.c.hall@gmail.com"
+  },
+  "homepage": "https://github.com/chrischall/angi-mcp",
+  "repository": "https://github.com/chrischall/angi-mcp",
+  "license": "MIT",
+  "keywords": ["angi", "home-services", "contractors", "reviews", "mcp"],
+  "skills": "./skills/",
+  "mcp": "./.mcp.json"
+}

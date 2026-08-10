@@ -1,0 +1,77 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/dxt/main/dist/mcpb-manifest.schema.json",
+  "manifest_version": "0.3",
+  "name": "angi-mcp",
+  "display_name": "Angi",
+  "version": "0.0.0",
+  "description": "Angi home-services access for Claude \u2014 find pros by trade and city, read ratings and reviews",
+  "author": {
+    "name": "Chris Chall",
+    "email": "chris.c.hall@gmail.com",
+    "url": "https://github.com/chrischall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrischall/angi-mcp"
+  },
+  "homepage": "https://github.com/chrischall/angi-mcp",
+  "support": "https://github.com/chrischall/angi-mcp/issues",
+  "license": "MIT",
+  "keywords": [
+    "angi",
+    "home-services",
+    "contractors",
+    "reviews"
+  ],
+  "runtimes": {
+    "node": ">=22.5"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "dist/bundle.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/dist/bundle.js"
+      ]
+    }
+  },
+  "tools": [
+    {
+      "name": "angi_search_pros",
+      "description": "Find Angi pros by trade and US city, with ratings and review counts"
+    },
+    {
+      "name": "angi_get_pro",
+      "description": "Read one pro's full Angi profile and ratings breakdown"
+    },
+    {
+      "name": "angi_get_reviews",
+      "description": "Read the reviews on a pro's Angi profile, filterable by rating"
+    },
+    {
+      "name": "angi_list_trades",
+      "description": "List every trade slug Angi publishes"
+    },
+    {
+      "name": "angi_list_cities",
+      "description": "List the cities Angi publishes pages for, per trade"
+    },
+    {
+      "name": "angi_healthcheck",
+      "description": "Check the fetchproxy browser-bridge connection"
+    },
+    {
+      "name": "angi_get_account",
+      "description": "The signed-in Angi user's identity and project counts"
+    },
+    {
+      "name": "angi_list_my_projects",
+      "description": "The signed-in user's Angi projects, open and closed"
+    },
+    {
+      "name": "angi_list_my_reviews",
+      "description": "Reviews the signed-in user has written, plus pros awaiting a rating"
+    }
+  ]
+}
