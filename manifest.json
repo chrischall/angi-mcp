@@ -23,9 +23,6 @@
     "contractors",
     "reviews"
   ],
-  "runtimes": {
-    "node": ">=22.5"
-  },
   "server": {
     "type": "node",
     "entry_point": "dist/bundle.js",
@@ -73,5 +70,15 @@
       "name": "angi_list_my_reviews",
       "description": "Reviews the signed-in user has written, plus pros awaiting a rating"
     }
-  ]
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=22.5.0"
+    }
+  }
 }
