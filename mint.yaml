@@ -22,6 +22,11 @@ state:
     API refuses bridge without it.
 egress:
   allow:
-    # Only hosts the SERVER process actually fetches.
-    - angi.com
+    # Only hosts the SERVER process actually fetches. Content pages
+    # (www.angi.com) and the signed-in account app (my.angi.com) are dialled
+    # by the user's browser tab over the bridge, never by this process, so
+    # they are NOT listed. The one direct dial is the taxonomy: the trade/city
+    # sitemaps under https://www.angi.com/sitemap/ are fetched with plain
+    # node fetch (src/client.ts getSitemap), 200 with no redirect. The apex
+    # angi.com is never dialled — ORIGIN is www.
     - www.angi.com
