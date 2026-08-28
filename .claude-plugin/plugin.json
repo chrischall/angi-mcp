@@ -1,7 +1,7 @@
 {
   "name": "angi-mcp",
   "displayName": "Angi",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Angi home-services access for Claude — find pros by trade and city, read ratings, reviews and pro profiles",
   "author": {
     "name": "Chris Hall",

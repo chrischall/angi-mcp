@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/chrischall/angi-mcp/compare/v0.1.1...v0.1.2) (2026-08-28)
+
+
+### Bug Fixes
+
+* **egress:** declare only the hosts the server process dials in mint.yaml ([#13](https://github.com/chrischall/angi-mcp/issues/13)) ([31a37ae](https://github.com/chrischall/angi-mcp/commit/31a37ae3b3f118a2b309237ff2211fcd4fae36f1))
+
 ## [0.1.1](https://github.com/chrischall/angi-mcp/compare/v0.1.0...v0.1.1) (2026-08-28)
 
 
