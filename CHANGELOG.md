@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/chrischall/angi-mcp/compare/v0.1.0...v0.1.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* move the node floor under compatibility so mcpb can pack the bundle ([#11](https://github.com/chrischall/angi-mcp/issues/11)) ([808e578](https://github.com/chrischall/angi-mcp/commit/808e57840e097641bd4832462eedf121b70572c6))
+
 ## 0.1.0 (2026-08-10)
 
 

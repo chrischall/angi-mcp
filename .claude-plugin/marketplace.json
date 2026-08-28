@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "MCP server for Angi — find home-service pros by trade and city, read ratings, reviews and pro profiles. Angi serves its pages only to a real browser, so requests route through the user's own angi.com tab via the fetchproxy browser extension, reusing their existing session. The trade/city taxonomy is read from Angi's public sitemaps directly.",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
@@ -15,7 +15,7 @@
       "displayName": "Angi",
       "source": "./",
       "description": "MCP server for Angi — find home-service pros, read ratings and reviews",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "Chris Hall"
       },
