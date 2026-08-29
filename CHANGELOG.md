@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/chrischall/angi-mcp/compare/v0.1.2...v0.2.0) (2026-08-29)
+
+
+### Features
+
+* **deps:** take @fetchproxy/server 2.2.0 so the concentrator can bind its sandbox address ([#15](https://github.com/chrischall/angi-mcp/issues/15)) ([a174636](https://github.com/chrischall/angi-mcp/commit/a17463656e139cb3f2841f0361162fe41626b2e6))
+
 ## [0.1.2](https://github.com/chrischall/angi-mcp/compare/v0.1.1...v0.1.2) (2026-08-28)
 
 
