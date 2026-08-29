@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "angi-mcp",
   "display_name": "Angi",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Angi home-services access for Claude — find pros by trade and city, read ratings and reviews",
   "author": {
     "name": "Chris Chall",
