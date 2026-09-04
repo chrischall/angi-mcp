@@ -5,7 +5,7 @@
 
 ### Features
 
-* **tools:** compact by default — strip media URLs, and minify every response ([#30](https://github.com/chrischall/angi-mcp/issues/30)) ([c0af7c1](https://github.com/chrischall/angi-mcp/commit/c0af7c1de8bd91b2236fee49515f4f2ff15f9b67))
+* **tools:** minify every response — no formatting whitespace on any payload ([#30](https://github.com/chrischall/angi-mcp/issues/30)) ([c0af7c1](https://github.com/chrischall/angi-mcp/commit/c0af7c1de8bd91b2236fee49515f4f2ff15f9b67))
 
 
 ### Bug Fixes
