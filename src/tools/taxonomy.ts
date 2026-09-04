@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { textResult, toolAnnotations } from '@chrischall/mcp-utils';
+import { minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
 
@@ -27,7 +27,7 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
           const needle = contains.toLowerCase();
           trades = trades.filter((t) => t.includes(needle));
         }
-        return textResult({ count: trades.length, trades });
+        return minifiedResult({ count: trades.length, trades });
       })
   );
 
@@ -58,7 +58,7 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
           const needle = contains.toLowerCase();
           cities = cities.filter((c) => c.city.includes(needle));
         }
-        return textResult({ trade, count: cities.length, cities });
+        return minifiedResult({ trade, count: cities.length, cities });
       })
   );
 }
