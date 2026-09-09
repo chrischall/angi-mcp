@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/chrischall/angi-mcp/compare/v0.3.0...v0.3.1) (2026-09-09)
+
+
+### Bug Fixes
+
+* **deps:** require @fetchproxy/server ^2.7.0, the first that reads FETCHPROXY_IDENTITY_DIR ([#42](https://github.com/chrischall/angi-mcp/issues/42)) ([361ec46](https://github.com/chrischall/angi-mcp/commit/361ec466e91c093616ca59f25c7d70e99ecefb0b))
+
 ## [0.3.0](https://github.com/chrischall/angi-mcp/compare/v0.2.0...v0.3.0) (2026-09-04)
 
 
