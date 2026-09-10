@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2](https://github.com/chrischall/angi-mcp/compare/v0.3.1...v0.3.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 2.10.0 and @chrischall/mcp-utils 0.26.1 ([#46](https://github.com/chrischall/angi-mcp/issues/46)) ([93ae0c0](https://github.com/chrischall/angi-mcp/commit/93ae0c0ec97ceed63a6c8eb8397bb7b95d250783))
+* **deps:** take @fetchproxy/server 2.9.1 so a pairing prompt survives ([#44](https://github.com/chrischall/angi-mcp/issues/44)) ([6e89c0b](https://github.com/chrischall/angi-mcp/commit/6e89c0bb2ac7a334ce38780cb528b12f4d30295c))
+
 ## [0.3.1](https://github.com/chrischall/angi-mcp/compare/v0.3.0...v0.3.1) (2026-09-09)
 
 
