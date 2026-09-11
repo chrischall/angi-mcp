@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/chrischall/angi-mcp/compare/v0.3.2...v0.3.3) (2026-09-11)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 2.11.3, so the hosted extension pin persists ([#48](https://github.com/chrischall/angi-mcp/issues/48)) ([0a150d0](https://github.com/chrischall/angi-mcp/commit/0a150d002b82f8598feb4c7a6865c3c0803a1d53))
+
 ## [0.3.2](https://github.com/chrischall/angi-mcp/compare/v0.3.1...v0.3.2) (2026-09-10)
 
 
