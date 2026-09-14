@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.3](https://github.com/chrischall/angi-mcp/compare/v0.3.2...v0.3.3) (2026-09-14)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 2.11.3, so the hosted extension pin persists ([#48](https://github.com/chrischall/angi-mcp/issues/48)) ([0a150d0](https://github.com/chrischall/angi-mcp/commit/0a150d002b82f8598feb4c7a6865c3c0803a1d53))
+* **deps:** @fetchproxy/server 3.0.0 — protocol v4 (forward secrecy, AAD over the frame) ([#52](https://github.com/chrischall/angi-mcp/issues/52)) ([dfc1a91](https://github.com/chrischall/angi-mcp/commit/dfc1a910e7e2c9b54f8c36efb9617495bbe6a75a))
+* **deps:** Bump the production-dependencies group with 2 updates ([#51](https://github.com/chrischall/angi-mcp/issues/51)) ([46a9ff5](https://github.com/chrischall/angi-mcp/commit/46a9ff59572a7177109cf8e9298d41e5bd5ca0fe))
+
 ## [0.3.2](https://github.com/chrischall/angi-mcp/compare/v0.3.1...v0.3.2) (2026-09-10)
 
 
