@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/chrischall/angi-mcp/compare/v0.3.3...v0.3.4) (2026-09-15)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 3.0.1 — capped peer frames, logged load drops, atomic identity writes ([#53](https://github.com/chrischall/angi-mcp/issues/53)) ([8f7c5bc](https://github.com/chrischall/angi-mcp/commit/8f7c5bca36dfba0b09b274699eb8cf4027407a13))
+
 ## [0.3.3](https://github.com/chrischall/angi-mcp/compare/v0.3.2...v0.3.3) (2026-09-14)
 
 
