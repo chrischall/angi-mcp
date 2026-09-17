@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
@@ -16,7 +16,7 @@ export function registerSearchTools(server: McpServer, client: AngiClient): void
         'and angi_list_cities first. 10 pros per page; use `page` to walk further. ' +
         'Note Angi has no zip-code filter: location comes from the city slug only.',
       annotations: toolAnnotations({ title: 'Search Angi pros', idempotent: true, openWorld: true }),
-      inputSchema: {
+      inputSchema: z.object({
         trade: z
           .string()
           .describe('Trade slug, e.g. "plumbing", "roofing", "air-duct-cleaning".'),
@@ -29,7 +29,7 @@ export function registerSearchTools(server: McpServer, client: AngiClient): void
           .describe(
             'Return a slim summary per pro instead of the full record. Recommended when browsing or ranking.'
           ),
-      },
+      }),
     },
     async (args) =>
       guard('angi_search_pros', async () => minifiedResult(await client.searchPros(args)))

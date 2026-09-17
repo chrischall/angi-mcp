@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
@@ -13,12 +13,12 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
         '"basement-waterproofing"). Call this to resolve a free-text trade to the slug ' +
         'angi_search_pros needs. Reads Angi\'s public sitemap directly — no browser bridge required.',
       annotations: toolAnnotations({ title: 'List Angi trades', idempotent: true, openWorld: true }),
-      inputSchema: {
+      inputSchema: z.object({
         contains: z
           .string()
           .optional()
           .describe('Case-insensitive substring filter, e.g. "duct" or "roof".'),
-      },
+      }),
     },
     async ({ contains }) =>
       guard('angi_list_trades', async () => {
@@ -39,7 +39,7 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
         'confirm a city slug exists before searching, or to discover nearby cities. ' +
         'Reads Angi\'s public sitemap directly — no browser bridge required.',
       annotations: toolAnnotations({ title: 'List Angi cities', idempotent: true, openWorld: true }),
-      inputSchema: {
+      inputSchema: z.object({
         trade: z.string().describe('Trade slug, e.g. "plumbing".'),
         state: z
           .string()
@@ -49,7 +49,7 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
           .string()
           .optional()
           .describe('Case-insensitive substring filter on the city slug.'),
-      },
+      }),
     },
     async ({ trade, state, contains }) =>
       guard('angi_list_cities', async () => {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
@@ -20,13 +20,13 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
         'awards, tasks offered, contact address, and the ratings breakdown. Also reports how ' +
         'many reviews the page carries (fetch them with angi_get_reviews).',
       annotations: toolAnnotations({ title: 'Get Angi pro', idempotent: true, openWorld: true }),
-      inputSchema: {
+      inputSchema: z.object({
         profileUrl,
         compact: z
           .boolean()
           .optional()
           .describe('Return a slim summary instead of the full record.'),
-      },
+      }),
     },
     async ({ profileUrl: url, compact }) =>
       guard('angi_get_pro', async () => minifiedResult(await client.getPro(url, { compact })))
@@ -40,7 +40,7 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
         'date, service categories, verification flag, and the pro\'s public response where one ' +
         'exists. Filter by rating to isolate complaints or praise.',
       annotations: toolAnnotations({ title: 'Get Angi reviews', idempotent: true, openWorld: true }),
-      inputSchema: {
+      inputSchema: z.object({
         profileUrl,
         minRating: z.number().min(1).max(5).optional().describe('Keep reviews rated at least this.'),
         maxRating: z
@@ -54,7 +54,7 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
           .boolean()
           .optional()
           .describe('Return a slim summary per review instead of the full record.'),
-      },
+      }),
     },
     async ({ profileUrl: url, ...opts }) =>
       guard('angi_get_reviews', async () => minifiedResult(await client.getReviews(url, opts)))
