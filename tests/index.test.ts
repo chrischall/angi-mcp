@@ -55,6 +55,7 @@ describe('tool roster', () => {
     const harness = await createTestHarness((server) => registerSearchTools(server, client));
     const { tools } = await harness.client.listTools();
     const tool = tools.find((candidate) => candidate.name === 'angi_search_pros');
+    expect(tool).toBeDefined();
     expect(tool?.inputSchema).toMatchObject({
       type: 'object',
       properties: {
