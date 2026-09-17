@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0](https://github.com/chrischall/angi-mcp/compare/v0.3.4...v0.4.0) (2026-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mcp:** migrate server to SDK v2 ([#56](https://github.com/chrischall/angi-mcp/issues/56))
+
+### Features
+
+* **mcp:** migrate server to SDK v2 ([#56](https://github.com/chrischall/angi-mcp/issues/56)) ([441348b](https://github.com/chrischall/angi-mcp/commit/441348b5b04df38ca18e07fad39a35751884b4e1))
+
+
+### Bug Fixes
+
+* **build:** preserve Zod initialization in standalone bundle ([#59](https://github.com/chrischall/angi-mcp/issues/59)) ([83c1085](https://github.com/chrischall/angi-mcp/commit/83c10854d8172b5e2ce0d221807b3c10f48a377d))
+* **mcp:** verify SDK v2 tool schema ([#60](https://github.com/chrischall/angi-mcp/issues/60)) ([a21c1b1](https://github.com/chrischall/angi-mcp/commit/a21c1b10a9125451a675eb1d55ce9206fad1abda)), closes [#57](https://github.com/chrischall/angi-mcp/issues/57)
+
 ## [0.3.4](https://github.com/chrischall/angi-mcp/compare/v0.3.3...v0.3.4) (2026-09-15)
 
 
