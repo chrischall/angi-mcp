@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { createTestHarness } from '@chrischall/mcp-utils/test';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -47,6 +48,23 @@ describe('tool roster', () => {
       'angi_list_trades',
       'angi_search_pros',
     ]);
+  });
+
+  it('publishes search inputs through the SDK v2 tools/list schema', async () => {
+    const client = new AngiClient({ transport: stubTransport });
+    const harness = await createTestHarness((server) => registerSearchTools(server, client));
+    const { tools } = await harness.client.listTools();
+    const tool = tools.find((candidate) => candidate.name === 'angi_search_pros');
+    expect(tool?.inputSchema).toMatchObject({
+      type: 'object',
+      properties: {
+        trade: { type: 'string' },
+        state: { type: 'string' },
+        city: { type: 'string' },
+      },
+      required: ['trade', 'state', 'city'],
+    });
+    await harness.close();
   });
 
   it('namespaces every tool under angi_', () => {
