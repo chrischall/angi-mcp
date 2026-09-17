@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
@@ -22,7 +22,7 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
         'The signed-in Angi user: first name, user/entity ids, unread message count, and how ' +
         'many open and closed projects they have. Requires the browser tab to be signed in.',
       annotations: toolAnnotations({ title: 'Get Angi account', idempotent: true, openWorld: true }),
-      inputSchema: {},
+      inputSchema: z.object({}),
     },
     async () => guard('angi_get_account', async () => minifiedResult(await client.getAccount()))
   );
@@ -40,12 +40,12 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
         idempotent: true,
         openWorld: true,
       }),
-      inputSchema: {
+      inputSchema: z.object({
         status: z
           .enum(['open', 'closed', 'all'])
           .optional()
           .describe('Which project list to return. Defaults to all.'),
-      },
+      }),
     },
     async ({ status }) =>
       guard('angi_list_my_projects', async () =>
@@ -65,7 +65,7 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
         idempotent: true,
         openWorld: true,
       }),
-      inputSchema: {},
+      inputSchema: z.object({}),
     },
     async () => guard('angi_list_my_reviews', async () => minifiedResult(await client.listMyReviews()))
   );

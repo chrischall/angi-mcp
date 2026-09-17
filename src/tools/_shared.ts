@@ -1,5 +1,5 @@
 import { errorResult, messageOf, wrapToolError, McpToolError } from '@chrischall/mcp-utils';
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import type { CallToolResult } from '@modelcontextprotocol/server';
 
 /**
  * Run a tool body, converting any throw into an MCP error result.
