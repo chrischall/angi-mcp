@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.0](https://github.com/chrischall/angi-mcp/compare/v0.4.0...v1.0.0) (2026-09-20)
+
+
+### Features
+
+* **deps:** take mcp-utils 1.0.0 so server/discover answers ([#63](https://github.com/chrischall/angi-mcp/issues/63)) ([b4ebbdd](https://github.com/chrischall/angi-mcp/commit/b4ebbdddebf9db3f002450185eba58a092871ec7))
+
+
+### Bug Fixes
+
+* **release:** drop bump-minor-pre-major so a breaking change cuts a major ([#65](https://github.com/chrischall/angi-mcp/issues/65)) ([659728d](https://github.com/chrischall/angi-mcp/commit/659728ddec5f96047e6c65042ae3c532d7e09cd4))
+* **release:** restate the Release-As footer the squash dropped ([#66](https://github.com/chrischall/angi-mcp/issues/66)) ([8a1a86c](https://github.com/chrischall/angi-mcp/commit/8a1a86cfbc51715a8a31c76f66c68ff2248dbcd5))
+
 ## [0.4.0](https://github.com/chrischall/angi-mcp/compare/v0.3.4...v0.4.0) (2026-09-17)
 
 
