@@ -55,13 +55,23 @@ describe('version sync', () => {
     }
   });
 
-  it('is configured so the first release is 0.1.0, not 1.0.0', () => {
+  it('is configured so the FIRST release is 0.1.0, not 1.0.0', () => {
     const cfg = readJson('release-please-config.json').packages['.'];
     // With no prior tag release-please applies its initial-release default and
     // proposes 1.0.0 — a brand-new server advertising a stable API it has not
-    // earned. `initial-version` pins the first release, and
-    // `bump-minor-pre-major` stops a later breaking change on 0.x from
-    // silently declaring 1.0.0.
+    // earned. `initial-version` pins that first release, and it is the only
+    // half of this still worth asserting.
+    //
+    // `bump-minor-pre-major` used to be asserted here too, and it was a
+    // DIFFERENT claim wearing the same sentence: it governs every later
+    // breaking change rather than the first release, and it does so by
+    // downgrading one to a minor for as long as the package sits below 1.0.
+    // That kept this server on 0.x through the SDK v2 migration — a breaking
+    // change with its own warning section in the changelog — and would have
+    // kept it there indefinitely. It is removed, so a breaking commit now
+    // cuts a major on its own, and the guard is not reinstated: the version
+    // this repo has earned is the one release-please should be free to
+    // propose.
     //
     // Deliberately NOT asserted here: that the manifest still reads its 0.0.0
     // seed. Advancing that value is release-please's whole job, so pinning it
@@ -69,6 +79,6 @@ describe('version sync', () => {
     // (v0.1.0) — the assertion described a transient state, not an invariant.
     // The manifest is already checked against package.json above.
     expect(cfg['initial-version']).toBe('0.1.0');
-    expect(cfg['bump-minor-pre-major']).toBe(true);
+    expect(cfg['bump-minor-pre-major']).toBeUndefined();
   });
 });
