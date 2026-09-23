@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/chrischall/angi-mcp/compare/v1.0.0...v1.0.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **deps:** require zod ^4.6.5 to match @chrischall/mcp-utils 2.4.0 ([#72](https://github.com/chrischall/angi-mcp/issues/72)) ([5b5387e](https://github.com/chrischall/angi-mcp/commit/5b5387e56fa6a7c58b3186ab84f7532f9b4bc044))
+* **deps:** upgrade @chrischall/mcp-utils to 2.4.0 and @fetchproxy/* to 3.2.0 ([#70](https://github.com/chrischall/angi-mcp/issues/70)) ([d7d5fdf](https://github.com/chrischall/angi-mcp/commit/d7d5fdfe00bb5644808470f75edb7f6c5a2e4ba3))
+
 ## [1.0.0](https://github.com/chrischall/angi-mcp/compare/v0.4.0...v1.0.0) (2026-09-20)
 
 
