@@ -238,6 +238,22 @@ describe('getReviews', () => {
     expect(res.count).toBe(1);
   });
 
+  it('filters reviews that carry only starRating', async () => {
+    const starOnly = new AngiClient({
+      transport: stubTransport({
+        body: makePage([
+          row('7', { reviewId: 's-1', starRating: 5, text: 'Great.' }),
+          row('8', { reviewId: 's-2', starRating: 2, text: 'Late.' }),
+          row('9', { reviewId: 's-3', starRating: 1, text: 'No show.' }),
+        ]),
+      }),
+    });
+    const low = await starOnly.getReviews('/companylist/us/nc/x.htm', { maxRating: 3 });
+    expect(low.reviews.map((r: any) => r.reviewId)).toEqual(['s-2', 's-3']);
+    const high = await starOnly.getReviews('/companylist/us/nc/x.htm', { minRating: 4 });
+    expect(high.reviews.map((r: any) => r.reviewId)).toEqual(['s-1']);
+  });
+
   it('honours limit', async () => {
     const res = await client().getReviews('/companylist/us/nc/x.htm', { limit: 1 });
     expect(res.count).toBe(1);

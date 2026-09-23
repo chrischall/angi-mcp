@@ -153,23 +153,32 @@ export interface CompactReview {
   proResponse?: string;
 }
 
+/**
+ * A review's star rating. Most pages carry it as `rating`, but some emit
+ * `starRating` instead (docs/ANGI-API.md). Everything that reads a review's
+ * rating goes through here so the filter and the projection can't disagree.
+ */
+export function reviewRating(raw: Record<string, unknown>): number | undefined {
+  if (typeof raw.rating === 'number') return raw.rating;
+  if (typeof raw.starRating === 'number') return raw.starRating;
+  return undefined;
+}
+
 export function compactReview(raw: Record<string, unknown>): CompactReview | null {
   if (!raw || typeof raw !== 'object' || raw.reviewId === undefined) return null;
   // Same reasoning as compactProvider: reviews are extracted by `reviewId`, so
   // require a field the projection actually reads. A review with neither a
   // rating nor body text means the shape moved.
-  const hasRating =
-    typeof raw.rating === 'number' || typeof raw.starRating === 'number';
-  if (!hasRating && resolvedText(raw.text) === undefined) return null;
+  const rating = reviewRating(raw);
+  if (rating === undefined && resolvedText(raw.text) === undefined) return null;
   const cats = Array.isArray(raw.categories)
     ? (raw.categories as Record<string, unknown>[])
         .map((c) => c?.name)
         .filter((n): n is string => typeof n === 'string')
     : undefined;
-  const rating = typeof raw.rating === 'number' ? raw.rating : raw.starRating;
   return {
     reviewId: typeof raw.reviewId === 'string' ? raw.reviewId : undefined,
-    rating: typeof rating === 'number' ? rating : undefined,
+    rating,
     text: resolvedText(raw.text),
     cost: typeof raw.cost === 'number' ? raw.cost : undefined,
     date: typeof raw.reportDate === 'string' ? raw.reportDate : undefined,
@@ -332,10 +341,16 @@ export class AngiClient {
     const html = await this.fetchHtml(path);
     let raw = recordsFromHtml(html, REVIEW_KEY);
     if (minRating !== undefined) {
-      raw = raw.filter((r) => typeof r.rating === 'number' && r.rating >= minRating);
+      raw = raw.filter((r) => {
+        const rating = reviewRating(r);
+        return rating !== undefined && rating >= minRating;
+      });
     }
     if (maxRating !== undefined) {
-      raw = raw.filter((r) => typeof r.rating === 'number' && r.rating <= maxRating);
+      raw = raw.filter((r) => {
+        const rating = reviewRating(r);
+        return rating !== undefined && rating <= maxRating;
+      });
     }
     if (limit !== undefined) raw = raw.slice(0, limit);
 
