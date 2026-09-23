@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/chrischall/angi-mcp/compare/v1.0.1...v1.0.2) (2026-09-23)
+
+
+### Bug Fixes
+
+* **reviews:** honour starRating when filtering by min/maxRating ([#73](https://github.com/chrischall/angi-mcp/issues/73)) ([fd3b83a](https://github.com/chrischall/angi-mcp/commit/fd3b83a41d9943de9026078c868865a85609c8ea))
+
 ## [1.0.1](https://github.com/chrischall/angi-mcp/compare/v1.0.0...v1.0.1) (2026-09-23)
 
 
