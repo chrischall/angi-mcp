@@ -34,9 +34,17 @@ Register it with your MCP host:
 You also need the **ContextMint Bridge** browser extension, with an open
 `angi.com` tab and its site access allowing `angi.com`. Install it from the
 [ContextMint Bridge releases](https://github.com/nullnet-app/contextmint-bridge/releases):
-in Chrome, unzip the Chrome build and load it via `chrome://extensions` →
-*Load unpacked*; in Safari it ships inside the ContextMint app. On the first
-request the extension shows a pairing code to approve; the trust then persists.
+unzip the Chrome build and load it via `chrome://extensions` → *Load
+unpacked*. Safari isn't available yet (it will ship inside the ContextMint app,
+which has no public download), so use Chrome for now. On the first request the
+extension shows a pairing code to approve; the trust then persists.
+
+ContextMint Bridge is the fetchproxy browser extension under its new name, from
+the same maintainer — fetchproxy's own README
+(https://github.com/chrischall/fetchproxy#extension) points to it. Its source is
+public at https://github.com/nullnet-app/contextmint-bridge: build it yourself,
+or check a release zip against the `.sha256` file published beside it
+(`shasum -a 256 -c contextmint-bridge-chrome-<version>.zip.sha256`).
 
 Run `angi_healthcheck` to confirm the bridge is connected.
 
