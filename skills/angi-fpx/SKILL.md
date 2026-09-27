@@ -33,9 +33,10 @@ fpx pair -p angi --subdomain www            # approve the 6-digit code in Contex
 ```
 
 Requires the **ContextMint Bridge** extension (install from
-https://github.com/nullnet-app/contextmint-bridge/releases — Chrome: load the
-Chrome zip unpacked; Safari: ships inside the ContextMint app) with an open
+https://github.com/nullnet-app/contextmint-bridge/releases — load the Chrome zip
+unpacked; Safari isn't available yet, so use Chrome for now) with an open
 `www.angi.com` tab and its *Site access* allowing `angi.com`. Pairing persists across invocations.
+ContextMint Bridge is the renamed fetchproxy extension (same maintainer; source at https://github.com/nullnet-app/contextmint-bridge — build it or verify a release zip with `shasum -a 256 -c contextmint-bridge-chrome-<version>.zip.sha256`).
 
 **Pair per host you intend to fetch, and keep a tab open on it.** The bridge
 relays through a tab on the request's own host, so a bare `fpx pair -p angi`
