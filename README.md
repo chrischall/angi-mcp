@@ -5,8 +5,8 @@ home-service pros by trade and city, and read their ratings, profiles and
 reviews.
 
 Angi serves its pages only to a real browser, so requests route through the
-user's own `angi.com` tab via the [fetchproxy](https://github.com/chrischall/fetchproxy)
-browser extension, reusing their existing session. The trade/city taxonomy is
+user's own `angi.com` tab via the [ContextMint Bridge](https://github.com/nullnet-app/contextmint-bridge)
+browser extension ([fetchproxy](https://github.com/chrischall/fetchproxy) protocol), reusing their existing session. The trade/city taxonomy is
 read directly from Angi's public sitemaps and needs no browser at all.
 
 **No Angi account or credentials are required.** Everything this server reads
@@ -31,9 +31,12 @@ Register it with your MCP host:
 }
 ```
 
-You also need the fetchproxy **Transporter** browser extension, with an open
-`angi.com` tab and its site access allowing `angi.com`. On the first request
-the extension shows a pairing code to approve; the trust then persists.
+You also need the **ContextMint Bridge** browser extension, with an open
+`angi.com` tab and its site access allowing `angi.com`. Install it from the
+[ContextMint Bridge releases](https://github.com/nullnet-app/contextmint-bridge/releases):
+in Chrome, unzip the Chrome build and load it via `chrome://extensions` →
+*Load unpacked*; in Safari it ships inside the ContextMint app. On the first
+request the extension shows a pairing code to approve; the trust then persists.
 
 Run `angi_healthcheck` to confirm the bridge is connected.
 

@@ -3,7 +3,7 @@
 //
 // Boot sequence:
 //   1. Construct a FetchproxyTransport on 127.0.0.1:37149 — the port the whole
-//      fetchproxy fleet shares, which the Transporter browser extension dials.
+//      fetchproxy fleet shares, which the ContextMint Bridge extension dials.
 //   2. AngiClient.start() brings the bridge up BEFORE runMcp connects stdio, so
 //      a bridge that cannot come up surfaces here rather than wedging the
 //      JSON-RPC channel on the host's first tool call.
@@ -43,8 +43,8 @@ await runMcp({
   ],
   banner:
     `[angi-mcp] v${VERSION} — reads angi.com through the user's signed-in browser tab via the ` +
-    `fetchproxy bridge on 127.0.0.1:${port}. Install the fetchproxy extension ` +
-    '(see https://github.com/chrischall/fetchproxy) and keep an angi.com tab open. ' +
+    `fetchproxy bridge on 127.0.0.1:${port}. Install the ContextMint Bridge extension ` +
+    '(see https://github.com/nullnet-app/contextmint-bridge/releases) and keep an angi.com tab open. ' +
     'This project was developed and is maintained by AI (Claude). Use at your own discretion.',
   shutdown: { onSignal: () => client.close() },
 });
