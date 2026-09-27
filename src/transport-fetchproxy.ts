@@ -31,7 +31,7 @@ export {
 export type { BridgeError };
 
 /**
- * The whole fetchproxy fleet shares this concentrator port — the Transporter
+ * The whole fetchproxy fleet shares this concentrator port — the ContextMint Bridge
  * extension dials this one port and servers host/peer-elect on it. Picking a
  * "unique" port means the extension never connects.
  */

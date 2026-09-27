@@ -13,7 +13,7 @@ description: >-
 Angi fronts `www.angi.com` with Cloudflare. Every content page returns **403**
 to plain `curl`/Node — only `robots.txt`, the sitemaps and `/auth/login` get
 through. `fpx` runs the fetch inside the user's own browser tab (the
-Transporter extension), which has already cleared the challenge, so the same
+ContextMint Bridge extension), which has already cleared the challenge, so the same
 URL succeeds. No Angi login is needed for the public data below — a normal open
 tab is enough; only the optional *Signed-in account data* section needs a
 signed-in tab.
@@ -29,11 +29,13 @@ Two surfaces, two tools — don't route everything through the bridge:
 ```sh
 npm install -g @fetchproxy/cli              # provides `fpx`
 fpx profile add angi --domain angi.com      # fetch capability only
-fpx pair -p angi --subdomain www            # approve the 6-digit code in Transporter
+fpx pair -p angi --subdomain www            # approve the 6-digit code in ContextMint Bridge
 ```
 
-Requires the **Transporter** extension with an open `www.angi.com` tab and its
-Chrome *Site access* allowing `angi.com`. Pairing persists across invocations.
+Requires the **ContextMint Bridge** extension (install from
+https://github.com/nullnet-app/contextmint-bridge/releases — Chrome: load the
+Chrome zip unpacked; Safari: ships inside the ContextMint app) with an open
+`www.angi.com` tab and its *Site access* allowing `angi.com`. Pairing persists across invocations.
 
 **Pair per host you intend to fetch, and keep a tab open on it.** The bridge
 relays through a tab on the request's own host, so a bare `fpx pair -p angi`
