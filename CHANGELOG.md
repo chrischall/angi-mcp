@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.3](https://github.com/chrischall/angi-mcp/compare/v1.0.2...v1.0.3) (2026-09-28)
+
+
+### Bug Fixes
+
+* **deps:** move to [@fetchproxy](https://github.com/fetchproxy) 3.4 for ContextMint Bridge errors, capability subsets and managed pins ([#77](https://github.com/chrischall/angi-mcp/issues/77)) ([18ab5f1](https://github.com/chrischall/angi-mcp/commit/18ab5f1bb6eab800f9a96c6c298089c9567cb9c2))
+* **deps:** move to @chrischall/mcp-utils 2.8 and [@fetchproxy](https://github.com/fetchproxy) 3.4.1 for clearer browser-bridge errors ([#79](https://github.com/chrischall/angi-mcp/issues/79)) ([064303d](https://github.com/chrischall/angi-mcp/commit/064303d38f5ada7c26e5d44a7d6c920a741f70d8))
+
+
+### Documentation
+
+* **skill:** separate the ContextMint Bridge note into its own paragraph in angi-fpx ([#81](https://github.com/chrischall/angi-mcp/issues/81)) ([a863ae0](https://github.com/chrischall/angi-mcp/commit/a863ae0fcfd30833ccae2148bbba4a770c296acd))
+
 ## [1.0.2](https://github.com/chrischall/angi-mcp/compare/v1.0.1...v1.0.2) (2026-09-23)
 
 
