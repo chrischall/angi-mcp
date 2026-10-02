@@ -72,6 +72,20 @@ describe('getAccount', () => {
     await expect(new AngiClient({ transport }).getAccount()).rejects.toThrow(/sign/i);
   });
 
+  it('reads only the real <script id="__NEXT_DATA__"> tag, not the marker inside another script (fleet-audit#1145)', async () => {
+    const decoy = '<script>var s = \'id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"initialState":{}}}}\';</script>';
+    const transport = stub(() => ({ body: decoy + nextDataPage(EMPTY_ACCOUNT) }));
+    const account = await new AngiClient({ transport }).getAccount();
+    expect(account).toMatchObject({ firstName: 'Chris', userId: 12345 });
+  });
+
+  it('treats an unparseable __NEXT_DATA__ blob as missing', async () => {
+    const transport = stub(() => ({
+      body: '<script id="__NEXT_DATA__" type="application/json">{not json</script>',
+    }));
+    await expect(new AngiClient({ transport }).getAccount()).rejects.toThrow(/__NEXT_DATA__/);
+  });
+
   it('errors clearly when the page carries no __NEXT_DATA__', async () => {
     const transport = stub(() => ({ body: '<html><body>nothing</body></html>' }));
     await expect(new AngiClient({ transport }).getAccount()).rejects.toThrow(/__NEXT_DATA__/);

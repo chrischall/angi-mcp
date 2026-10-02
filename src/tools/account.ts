@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
-import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
 
 /**
@@ -24,7 +23,7 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
       annotations: toolAnnotations({ title: 'Get Angi account', idempotent: true, openWorld: true }),
       inputSchema: z.object({}),
     },
-    async () => guard('angi_get_account', async () => minifiedResult(await client.getAccount()))
+    async () => minifiedResult(await client.getAccount())
   );
 
   server.registerTool(
@@ -48,9 +47,7 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
       }),
     },
     async ({ status }) =>
-      guard('angi_list_my_projects', async () =>
-        minifiedResult(await client.listMyProjects({ status }))
-      )
+      minifiedResult(await client.listMyProjects({ status }))
   );
 
   server.registerTool(
@@ -67,6 +64,6 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
       }),
       inputSchema: z.object({}),
     },
-    async () => guard('angi_list_my_reviews', async () => minifiedResult(await client.listMyReviews()))
+    async () => minifiedResult(await client.listMyReviews())
   );
 }

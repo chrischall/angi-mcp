@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
-import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
 
 export function registerSearchTools(server: McpServer, client: AngiClient): void {
@@ -32,6 +31,6 @@ export function registerSearchTools(server: McpServer, client: AngiClient): void
       }),
     },
     async (args) =>
-      guard('angi_search_pros', async () => minifiedResult(await client.searchPros(args)))
+      minifiedResult(await client.searchPros(args))
   );
 }

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
-import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
 
 export function registerTaxonomyTools(server: McpServer, client: AngiClient): void {
@@ -20,15 +19,14 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
           .describe('Case-insensitive substring filter, e.g. "duct" or "roof".'),
       }),
     },
-    async ({ contains }) =>
-      guard('angi_list_trades', async () => {
-        let trades = await client.listTrades();
-        if (contains) {
-          const needle = contains.toLowerCase();
-          trades = trades.filter((t) => t.includes(needle));
-        }
-        return minifiedResult({ count: trades.length, trades });
-      })
+    async ({ contains }) => {
+      let trades = await client.listTrades();
+      if (contains) {
+        const needle = contains.toLowerCase();
+        trades = trades.filter((t) => t.includes(needle));
+      }
+      return minifiedResult({ count: trades.length, trades });
+    }
   );
 
   server.registerTool(
@@ -51,14 +49,13 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
           .describe('Case-insensitive substring filter on the city slug.'),
       }),
     },
-    async ({ trade, state, contains }) =>
-      guard('angi_list_cities', async () => {
-        let cities = await client.listCities(trade, { state });
-        if (contains) {
-          const needle = contains.toLowerCase();
-          cities = cities.filter((c) => c.city.includes(needle));
-        }
-        return minifiedResult({ trade, count: cities.length, cities });
-      })
+    async ({ trade, state, contains }) => {
+      let cities = await client.listCities(trade, { state });
+      if (contains) {
+        const needle = contains.toLowerCase();
+        cities = cities.filter((c) => c.city.includes(needle));
+      }
+      return minifiedResult({ trade, count: cities.length, cities });
+    }
   );
 }

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
-import { guard } from './_shared.js';
 import type { AngiClient } from '../client.js';
 
 const profileUrl = z
@@ -29,7 +28,7 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
       }),
     },
     async ({ profileUrl: url, compact }) =>
-      guard('angi_get_pro', async () => minifiedResult(await client.getPro(url, { compact })))
+      minifiedResult(await client.getPro(url, { compact }))
   );
 
   server.registerTool(
@@ -57,6 +56,6 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
       }),
     },
     async ({ profileUrl: url, ...opts }) =>
-      guard('angi_get_reviews', async () => minifiedResult(await client.getReviews(url, opts)))
+      minifiedResult(await client.getReviews(url, opts))
   );
 }
