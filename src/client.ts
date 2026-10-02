@@ -14,7 +14,7 @@ import {
 } from '@chrischall/mcp-utils';
 import {
   isCloudflareChallenge,
-  extractJsonAfterMarker,
+  extractNextData,
   decodeHtmlEntities,
 } from '@chrischall/mcp-utils/scrape';
 
@@ -442,10 +442,9 @@ export class AngiClient {
     if (/\/auth\/login/.test(res.url ?? '')) {
       throw new SessionNotAuthenticatedError('Angi', 'www.angi.com');
     }
-    const data = extractJsonAfterMarker(res.body, [
-      'id="__NEXT_DATA__" type="application/json">',
-      'id="__NEXT_DATA__"',
-    ]) as Record<string, unknown> | null;
+    // Tag-bounded and linear: only the real <script id="__NEXT_DATA__"> body
+    // is read, never the marker text inside another script (fleet-audit#1145).
+    const data = extractNextData(res.body);
     if (!data) {
       throw new McpToolError(`No __NEXT_DATA__ payload on my.angi.com${path}.`, {
         hint: 'Confirm the browser tab is signed in to Angi; signed-out requests are redirected to the login page.',

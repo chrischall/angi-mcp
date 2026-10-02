@@ -87,3 +87,44 @@ describe('tool roster', () => {
     }
   });
 });
+
+/**
+ * Error rendering comes from runMcp / createTestHarness (fleet-audit#980): a
+ * thrown McpToolError's hint is appended to the failing tool's text, and
+ * anything else still surfaces as an error result rather than being swallowed
+ * by a per-tool wrapper.
+ */
+describe('tool error rendering', () => {
+  function failing(fetch: AngiTransport['fetch']): AngiClient {
+    return new AngiClient({ transport: { ...stubTransport, fetch } });
+  }
+  function textOf(result: { content?: unknown }): string {
+    return ((result.content ?? []) as { type: string; text?: string }[])
+      .map((c) => c.text ?? '')
+      .join('');
+  }
+
+  it("appends a thrown McpToolError's hint to the tool's text", async () => {
+    const client = failing(async () => ({ status: 200, body: '<html>nothing</html>' }));
+    const harness = await createTestHarness((server) => registerAccountTools(server, client));
+    const result = await harness.client.callTool({ name: 'angi_get_account', arguments: {} });
+    expect(result.isError).toBe(true);
+    expect(textOf(result)).toMatch(/No __NEXT_DATA__ payload/);
+    expect(textOf(result)).toMatch(/Hint: Confirm the browser tab is signed in/);
+    await harness.close();
+  });
+
+  it('still reports an unexpected throw as an error result', async () => {
+    const client = failing(async () => {
+      throw new Error('bridge exploded');
+    });
+    const harness = await createTestHarness((server) => registerSearchTools(server, client));
+    const result = await harness.client.callTool({
+      name: 'angi_search_pros',
+      arguments: { trade: 'plumbing', state: 'nc', city: 'charlotte' },
+    });
+    expect(result.isError).toBe(true);
+    expect(textOf(result)).toMatch(/bridge exploded/);
+    await harness.close();
+  });
+});
