@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.4](https://github.com/chrischall/angi-mcp/compare/v1.0.3...v1.0.4) (2026-10-03)
+
+
+### Bug Fixes
+
+* **deps:** adopt @chrischall/mcp-utils 2.12.0 runMcp hint rendering and extractNextData ([#86](https://github.com/chrischall/angi-mcp/issues/86)) ([bea89b2](https://github.com/chrischall/angi-mcp/commit/bea89b281727853576eb0c32f2431bc26ba58c9e))
+* **deps:** bump @chrischall/mcp-utils to 2.13.0 ([#87](https://github.com/chrischall/angi-mcp/issues/87)) ([956da18](https://github.com/chrischall/angi-mcp/commit/956da1801e93458a607843d290de8e018527346a))
+* keep credentials and report edge_blocked on CDN/WAF blocks (mcp-utils 2.10.0) ([#85](https://github.com/chrischall/angi-mcp/issues/85)) ([d979c81](https://github.com/chrischall/angi-mcp/commit/d979c81b8c70ac9b9405ddef4e923ba8a55c0334))
+* report CDN/WAF blocks as edge_blocked, not a rejected credential (mcp-utils 2.9.0) ([#83](https://github.com/chrischall/angi-mcp/issues/83)) ([7e6cc0f](https://github.com/chrischall/angi-mcp/commit/7e6cc0f58c147e17692f85ab56f2c2179739dbc0))
+
 ## [1.0.3](https://github.com/chrischall/angi-mcp/compare/v1.0.2...v1.0.3) (2026-09-28)
 
 
