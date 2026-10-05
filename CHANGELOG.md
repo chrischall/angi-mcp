@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/chrischall/angi-mcp/compare/v1.0.4...v1.0.5) (2026-10-05)
+
+
+### Bug Fixes
+
+* **deps:** require @chrischall/mcp-utils 2.14.0 and MCP SDK 2.3.0 ([#88](https://github.com/chrischall/angi-mcp/issues/88)) ([7736d7f](https://github.com/chrischall/angi-mcp/commit/7736d7f522af7729fae78b2894d8bb09f2917361))
+
 ## [1.0.4](https://github.com/chrischall/angi-mcp/compare/v1.0.3...v1.0.4) (2026-10-03)
 
 
