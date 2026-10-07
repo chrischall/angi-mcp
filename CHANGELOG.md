@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.6](https://github.com/chrischall/angi-mcp/compare/v1.0.5...v1.0.6) (2026-10-07)
+
+
+### Bug Fixes
+
+* **deps:** Bump @fetchproxy/server from 3.4.1 to 3.5.1 in the production-dependencies group ([#92](https://github.com/chrischall/angi-mcp/issues/92)) ([be85e78](https://github.com/chrischall/angi-mcp/commit/be85e789f0d9af4d33cfcad44a3e2ddbe8701822))
+* **deps:** Bump source-map-js from 1.2.1 to 1.2.2 in the security group across 1 directory ([#95](https://github.com/chrischall/angi-mcp/issues/95)) ([c84008f](https://github.com/chrischall/angi-mcp/commit/c84008ff72484c2ea1b7062958e8759d7c6c4b68))
+* **deps:** retry browser-bridge connects awaiting approval and allow turning off write confirmations ([#94](https://github.com/chrischall/angi-mcp/issues/94)) ([7a7bcfa](https://github.com/chrischall/angi-mcp/commit/7a7bcfa5fd04a717a202632b04fd762e3d6e56d1))
+
 ## [1.0.5](https://github.com/chrischall/angi-mcp/compare/v1.0.4...v1.0.5) (2026-10-05)
 
 
