@@ -387,6 +387,65 @@ describe('taxonomy (plain fetch, never the bridge)', () => {
   });
 });
 
+describe('sitemap fetch: timeout, cancellation, caching (fleet-audit#345)', () => {
+  const trades = () =>
+    new Response('<urlset><loc>https://www.angi.com/companylist/us/ak/plumbing.htm</loc></urlset>');
+  /** A fetch that never answers until its signal aborts — a stalled angi.com. */
+  const stalled = vi.fn(
+    (_url: string, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(init.signal!.reason));
+      })
+  ) as unknown as typeof fetch;
+
+  it('times out a stalled sitemap instead of hanging', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: '' }),
+      sitemapFetch: stalled,
+      sitemapTimeoutMs: 20,
+    });
+    await expect(client.listTrades()).rejects.toThrow(/timed out/i);
+  });
+
+  it("honours the caller's cancellation signal", async () => {
+    const client = new AngiClient({ transport: stubTransport({ body: '' }), sitemapFetch: stalled });
+    const ac = new AbortController();
+    const p = client.listCities('plumbing', { signal: ac.signal });
+    ac.abort();
+    await expect(p).rejects.toThrow();
+    expect(ac.signal.aborted).toBe(true);
+  });
+
+  it('memoises the trade list and city lists within the TTL', async () => {
+    let now = 0;
+    const sitemapFetch = vi.fn(async () => trades()) as unknown as typeof fetch;
+    const client = new AngiClient({
+      transport: stubTransport({ body: '' }),
+      sitemapFetch,
+      sitemapTtlMs: 1000,
+      now: () => now,
+    });
+    await client.listTrades();
+    await client.listTrades();
+    await client.listCities('plumbing');
+    await client.listCities('plumbing', { state: 'nc' });
+    expect(sitemapFetch).toHaveBeenCalledTimes(2);
+    now = 1001;
+    await client.listTrades();
+    expect(sitemapFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not cache a failure', async () => {
+    const sitemapFetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('', { status: 500 }))
+      .mockResolvedValueOnce(trades()) as unknown as typeof fetch;
+    const client = new AngiClient({ transport: stubTransport({ body: '' }), sitemapFetch });
+    await expect(client.listTrades()).rejects.toThrow(/HTTP 500/);
+    expect(await client.listTrades()).toEqual(['plumbing']);
+  });
+});
+
 describe('compact projections', () => {
   it('returns null for a record that is not a provider', () => {
     expect(compactProvider({ foo: 1 } as Record<string, unknown>)).toBeNull();
