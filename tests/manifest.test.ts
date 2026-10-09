@@ -35,3 +35,33 @@ describe('manifest.json is packable by mcpb', () => {
     expect(Number(node.replace(/^\D*/, '').split('.')[0])).toBeLessThanOrEqual(22);
   });
 });
+
+describe('install surfaces declare the env the server reads', () => {
+  // The server reads ANGI_WS_PORT (src/index.ts) and ANGI_DEBUG
+  // (src/transport-fetchproxy.ts). An install path that does not declare a key
+  // leaves its users no way to set it.
+  const serverJson = JSON.parse(
+    readFileSync(fileURLToPath(new URL('../server.json', import.meta.url)), 'utf8'),
+  ) as { packages: { environmentVariables?: { name: string; isRequired?: boolean }[] }[] };
+  const SERVER_KEYS = ['ANGI_DEBUG', 'ANGI_WS_PORT'];
+
+  it('wires each server key through manifest.json mcp_config.env', () => {
+    const env = (manifest.server as { mcp_config: { env?: Record<string, string> } }).mcp_config.env ?? {};
+    expect(Object.keys(env).sort()).toEqual(expect.arrayContaining(SERVER_KEYS));
+  });
+
+  it('backs every ${user_config.*} reference with a declared, optional user_config entry', () => {
+    const env = (manifest.server as { mcp_config: { env?: Record<string, string> } }).mcp_config.env ?? {};
+    const userConfig = (manifest.user_config ?? {}) as Record<string, { required?: boolean }>;
+    const refs = Object.values(env).flatMap((v) => [...v.matchAll(/\$\{user_config\.([^}]+)\}/g)].map((m) => m[1]));
+    expect(refs.sort()).toEqual(Object.keys(userConfig).sort());
+    for (const k of refs) expect(userConfig[k]?.required, k).toBe(false);
+  });
+
+  it('declares each server key as optional in server.json', () => {
+    const vars = serverJson.packages.flatMap((p) => p.environmentVariables ?? []);
+    for (const k of SERVER_KEYS) {
+      expect(vars.find((v) => v.name === k), k).toMatchObject({ isRequired: false });
+    }
+  });
+});
