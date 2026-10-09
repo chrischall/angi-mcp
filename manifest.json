@@ -60,7 +60,7 @@
     },
     {
       "name": "angi_get_account",
-      "description": "The signed-in Angi user's identity and project counts"
+      "description": "The signed-in Angi user's name, email and project counts"
     },
     {
       "name": "angi_list_my_projects",

@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { createTestHarness } from '@chrischall/mcp-utils/test';
 import { AngiClient } from '../src/client.js';
+import { registerAccountTools } from '../src/tools/account.js';
 import type { AngiTransport, FetchInit, FetchResult } from '../src/transport.js';
 
 /**
@@ -163,5 +165,20 @@ describe('listMyReviews', () => {
     const res = await new AngiClient({ transport }).listMyReviews();
     expect(res.reviews).toEqual([]);
     expect(res.unratedPros).toEqual([]);
+  });
+});
+
+describe('angi_get_account description', () => {
+  it('discloses that the result includes the account email', async () => {
+    const transport = stub(() => ({ body: nextDataPage(EMPTY_ACCOUNT) }));
+    const client = new AngiClient({ transport });
+    const harness = await createTestHarness((server) => registerAccountTools(server, client));
+    const { tools } = await harness.client.listTools();
+    const tool = tools.find((t) => t.name === 'angi_get_account');
+    expect(tool?.description).toMatch(/\bemail\b/);
+    // Every field getAccount returns should be something the description admits to.
+    const account = await client.getAccount();
+    expect(Object.keys(account)).toContain('email');
+    await harness.close();
   });
 });
