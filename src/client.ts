@@ -307,17 +307,48 @@ export class AngiClient {
     return `${parsed.pathname}${parsed.search}`;
   }
 
+  /** Comparable form of a profile URL or path: decoded pathname, no query. */
+  private static pathKey(urlOrPath: string): string {
+    let pathname: string;
+    try {
+      pathname = new URL(urlOrPath, ORIGIN).pathname;
+    } catch {
+      return urlOrPath;
+    }
+    try {
+      return decodeURIComponent(pathname);
+    } catch {
+      return pathname;
+    }
+  }
+
   async getPro(
     profileUrl: string,
     { compact = false }: { compact?: boolean } = {}
   ): Promise<{ url: string; provider: unknown; reviewCount: number }> {
     const path = AngiClient.toPath(profileUrl);
     const html = await this.fetchHtml(path);
-    const [raw] = recordsFromHtml(html, PROVIDER_KEY, { limit: 1 });
-    if (!raw) {
+    const records = recordsFromHtml(html, PROVIDER_KEY);
+    if (records.length === 0) {
       throw new McpToolError(`No provider record found on ${path}.`, {
         hint: 'The URL may not be a pro profile page, or Angi changed the page shape.',
       });
+    }
+    // The first record on the page is not necessarily the requested pro: a
+    // search page lists many, and a profile can render a sponsored or
+    // "similar pros" card first. Pick the one whose profileUrl is this page.
+    const wanted = AngiClient.pathKey(path);
+    let raw = records.find(
+      (r) => typeof r.profileUrl === 'string' && AngiClient.pathKey(r.profileUrl) === wanted
+    );
+    // A lone record with no profileUrl at all is still the page's provider —
+    // there is nothing it could be confused with.
+    if (!raw && records.length === 1 && records[0].profileUrl === undefined) raw = records[0];
+    if (!raw) {
+      throw new McpToolError(
+        `${path} is not a profile page for one pro — it carries ${records.length} provider record(s), none of them for this URL.`,
+        { hint: 'Pass a profileUrl exactly as angi_search_pros returned it; use angi_search_pros for list pages.' }
+      );
     }
     const reviews = recordsFromHtml(html, REVIEW_KEY);
     const projected = compact ? compactProvider(raw) : null;

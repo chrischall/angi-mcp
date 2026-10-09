@@ -283,8 +283,60 @@ describe('getPro', () => {
     const client = new AngiClient({
       transport: stubTransport({ body: makePage([...PROVIDER_ROWS, ...REVIEW_ROWS]) }),
     });
-    const res = await client.getPro('/companylist/us/nc/x.htm');
+    const res = await client.getPro('/companylist/us/nc/monroe/superior-plumbing-reviews-1.htm');
     expect(res.reviewCount).toBe(2);
+  });
+
+  // fleet-audit#346: the page's first legacyId record is not necessarily the
+  // requested pro — a search page, or a profile with a sponsored card first.
+  const OTHER_PRO = row('5', {
+    id: 'uuid-2',
+    legacyId: '222',
+    profileUrl: '/companylist/us/nc/charlotte/other-pro-reviews-2.htm',
+    businessInfo: { businessName: 'Someone Else LLC' },
+  });
+
+  it('returns the record whose profileUrl is the requested page, not the first one', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: makePage([OTHER_PRO, ...PROVIDER_ROWS]) }),
+    });
+    const res = await client.getPro(
+      'https://www.angi.com/companylist/us/nc/monroe/superior-plumbing-reviews-1.htm?page=2'
+    );
+    expect((res.provider as any).legacyId).toBe('158675609');
+  });
+
+  it('refuses a page that carries no record for the requested pro (e.g. a search page)', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: makePage([OTHER_PRO, ...PROVIDER_ROWS]) }),
+    });
+    await expect(
+      client.getPro('/companylist/us/nc/charlotte/plumbing.htm')
+    ).rejects.toThrow(/not a profile page|No provider record/);
+  });
+
+  it('matches a percent-encoded profileUrl', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({
+        body: makePage([
+          row('3', {
+            id: 'u',
+            legacyId: '9',
+            profileUrl: '/companylist/us/nc/k/nc-septic-and-pump%2C-llc-reviews-1.htm',
+          }),
+        ]),
+      }),
+    });
+    const res = await client.getPro('/companylist/us/nc/k/nc-septic-and-pump,-llc-reviews-1.htm');
+    expect((res.provider as any).legacyId).toBe('9');
+  });
+
+  it('accepts a lone record that carries no profileUrl at all', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: makePage([row('3', { id: 'u', legacyId: '7' })]) }),
+    });
+    const res = await client.getPro('/companylist/us/nc/x.htm');
+    expect((res.provider as any).legacyId).toBe('7');
   });
 });
 
