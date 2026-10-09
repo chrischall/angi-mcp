@@ -10,9 +10,12 @@
 //   3. runMcp registers the tools, prints the stderr banner, wires
 //      SIGINT/SIGTERM to close the transport, and connects stdio.
 //
-// Angi needs no credentials: every tool here reads public pages. The bridge is
-// required not for authentication but for reachability — Cloudflare 403s any
-// server-side request to www.angi.com, so requests run inside the user's tab.
+// Angi needs no credentials of its own. Most tools read public www.angi.com
+// pages, but angi_get_account, angi_list_my_projects and angi_list_my_reviews
+// read my.angi.com with the tab's signed-in session and return the user's
+// personal data (name, email, projects, reviews). The bridge is required for
+// reachability too — Cloudflare 403s any server-side request to www.angi.com,
+// so every request runs inside the user's tab.
 
 import { runMcp, readPortEnv } from '@chrischall/mcp-utils';
 import { VERSION } from './version.js';

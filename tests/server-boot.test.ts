@@ -108,8 +108,9 @@ describe('server boot (built artifact)', () => {
   }, 30_000);
 
   it('boots with no credentials configured', async () => {
-    // Angi needs none — every tool reads public pages — so the server must come
-    // up cleanly in a bare environment rather than demanding configuration.
+    // Angi needs none — public tools read www.angi.com and the account tools ride
+    // the browser tab's own session — so the server must come up cleanly in a
+    // bare environment rather than demanding configuration.
     const tools = await listToolsViaStdio(BUNDLE, ROOT);
     expect(tools.length).toBeGreaterThanOrEqual(MIN_TOOLS);
   }, 30_000);

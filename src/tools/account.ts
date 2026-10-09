@@ -18,8 +18,9 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
     'angi_get_account',
     {
       description:
-        'The signed-in Angi user: first name, user/entity ids, unread message count, and how ' +
-        'many open and closed projects they have. Requires the browser tab to be signed in.',
+        'The signed-in Angi user: first name, email address, user/entity ids, unread message ' +
+        'count, and how many open and closed projects they have. Requires the browser tab to be ' +
+        'signed in.',
       annotations: toolAnnotations({ title: 'Get Angi account', idempotent: true, openWorld: true }),
       inputSchema: z.object({}),
     },

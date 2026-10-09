@@ -63,7 +63,7 @@ Signed-in tools (need the browser tab signed in to Angi):
 
 | Tool | What it does |
 | --- | --- |
-| `angi_get_account` | Your identity and open/closed project counts. |
+| `angi_get_account` | Your name, email and open/closed project counts. |
 | `angi_list_my_projects` | Your Angi projects, open and closed. |
 | `angi_list_my_reviews` | Reviews you've written, plus pros awaiting a rating. |
 
