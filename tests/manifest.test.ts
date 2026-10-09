@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const manifest = JSON.parse(
@@ -63,5 +63,24 @@ describe('install surfaces declare the env the server reads', () => {
     for (const k of SERVER_KEYS) {
       expect(vars.find((v) => v.name === k), k).toMatchObject({ isRequired: false });
     }
+  });
+});
+
+describe('.claude-plugin/plugin.json points Claude Code at the MCP config', () => {
+  // Claude Code reads the MCP config path from `mcpServers`; it ignores an
+  // `mcp` key (`claude plugin validate` reports "Unknown field 'mcp'"). With
+  // the default ./.mcp.json path that mistake is silent, but a copy of it with
+  // a non-default path ships a plugin that installs no MCP server at all.
+  const pluginJsonUrl = new URL('../.claude-plugin/plugin.json', import.meta.url);
+  const plugin = JSON.parse(readFileSync(fileURLToPath(pluginJsonUrl), 'utf8')) as Record<string, unknown>;
+
+  it('declares the config under mcpServers, not the ignored mcp key', () => {
+    expect(plugin).not.toHaveProperty('mcp');
+    expect(typeof plugin.mcpServers).toBe('string');
+  });
+
+  it('references an MCP config file that exists', () => {
+    const target = new URL(`../${plugin.mcpServers as string}`, import.meta.url);
+    expect(existsSync(fileURLToPath(target))).toBe(true);
   });
 });
