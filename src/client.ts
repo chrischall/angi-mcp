@@ -522,6 +522,11 @@ export class AngiClient {
         `Angi returned HTTP ${res.status} for my.angi.com/account/rating-review/reviews.`
       );
     }
+    // A challenge interstitial is not a sign-out: clearing it in the tab is the
+    // fix, so surface it before the JSON parse turns it into a sign-in error.
+    if (isCloudflareChallenge(res.body)) {
+      throw new BotWallError('/account/rating-review/reviews', undefined, { vendor: 'Cloudflare' });
+    }
     let body: { reviews?: unknown[]; unratedPros?: unknown[] };
     try {
       body = JSON.parse(res.body);
