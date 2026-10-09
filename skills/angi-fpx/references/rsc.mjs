@@ -6,6 +6,10 @@
 // Concatenating the unescaped literals yields newline-separated rows of the
 // form `<hexid>:<json>`. Values are deduplicated across rows, so a field can
 // hold the reference `"$b5"` instead of its value — resolve() follows those.
+//
+// This is a deliberate dependency-free copy of src/parse.ts (so the skill runs
+// as `node rsc.mjs` with no install). tests/skill-rsc-parity.test.ts runs both
+// on the same pages: change one, change the other, or CI fails.
 
 /** Recover the concatenated flight text from a raw HTML document. */
 export function flightText(html) {
@@ -133,7 +137,7 @@ export function objectsWithKey(text, key, { limit = Infinity, resolveRefs = true
       if (!span || i + span.length <= hit) continue; // does not enclose the hit
       let obj;
       try { obj = JSON.parse(span); } catch { continue; }
-      if (!(key in obj)) continue;
+      if (!obj || typeof obj !== 'object' || !(key in obj)) continue;
       const id = `${i}:${span.length}`;
       if (!seen.has(id)) {
         seen.add(id);

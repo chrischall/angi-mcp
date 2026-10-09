@@ -283,8 +283,60 @@ describe('getPro', () => {
     const client = new AngiClient({
       transport: stubTransport({ body: makePage([...PROVIDER_ROWS, ...REVIEW_ROWS]) }),
     });
-    const res = await client.getPro('/companylist/us/nc/x.htm');
+    const res = await client.getPro('/companylist/us/nc/monroe/superior-plumbing-reviews-1.htm');
     expect(res.reviewCount).toBe(2);
+  });
+
+  // fleet-audit#346: the page's first legacyId record is not necessarily the
+  // requested pro — a search page, or a profile with a sponsored card first.
+  const OTHER_PRO = row('5', {
+    id: 'uuid-2',
+    legacyId: '222',
+    profileUrl: '/companylist/us/nc/charlotte/other-pro-reviews-2.htm',
+    businessInfo: { businessName: 'Someone Else LLC' },
+  });
+
+  it('returns the record whose profileUrl is the requested page, not the first one', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: makePage([OTHER_PRO, ...PROVIDER_ROWS]) }),
+    });
+    const res = await client.getPro(
+      'https://www.angi.com/companylist/us/nc/monroe/superior-plumbing-reviews-1.htm?page=2'
+    );
+    expect((res.provider as any).legacyId).toBe('158675609');
+  });
+
+  it('refuses a page that carries no record for the requested pro (e.g. a search page)', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: makePage([OTHER_PRO, ...PROVIDER_ROWS]) }),
+    });
+    await expect(
+      client.getPro('/companylist/us/nc/charlotte/plumbing.htm')
+    ).rejects.toThrow(/not a profile page|No provider record/);
+  });
+
+  it('matches a percent-encoded profileUrl', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({
+        body: makePage([
+          row('3', {
+            id: 'u',
+            legacyId: '9',
+            profileUrl: '/companylist/us/nc/k/nc-septic-and-pump%2C-llc-reviews-1.htm',
+          }),
+        ]),
+      }),
+    });
+    const res = await client.getPro('/companylist/us/nc/k/nc-septic-and-pump,-llc-reviews-1.htm');
+    expect((res.provider as any).legacyId).toBe('9');
+  });
+
+  it('accepts a lone record that carries no profileUrl at all', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: makePage([row('3', { id: 'u', legacyId: '7' })]) }),
+    });
+    const res = await client.getPro('/companylist/us/nc/x.htm');
+    expect((res.provider as any).legacyId).toBe('7');
   });
 });
 
@@ -332,6 +384,65 @@ describe('taxonomy (plain fetch, never the bridge)', () => {
     ) as unknown as typeof fetch;
     const client = new AngiClient({ transport: stubTransport({ body: '' }), sitemapFetch });
     await expect(client.listTrades()).rejects.toThrow(/HTTP 500/);
+  });
+});
+
+describe('sitemap fetch: timeout, cancellation, caching (fleet-audit#345)', () => {
+  const trades = () =>
+    new Response('<urlset><loc>https://www.angi.com/companylist/us/ak/plumbing.htm</loc></urlset>');
+  /** A fetch that never answers until its signal aborts — a stalled angi.com. */
+  const stalled = vi.fn(
+    (_url: string, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(init.signal!.reason));
+      })
+  ) as unknown as typeof fetch;
+
+  it('times out a stalled sitemap instead of hanging', async () => {
+    const client = new AngiClient({
+      transport: stubTransport({ body: '' }),
+      sitemapFetch: stalled,
+      sitemapTimeoutMs: 20,
+    });
+    await expect(client.listTrades()).rejects.toThrow(/timed out/i);
+  });
+
+  it("honours the caller's cancellation signal", async () => {
+    const client = new AngiClient({ transport: stubTransport({ body: '' }), sitemapFetch: stalled });
+    const ac = new AbortController();
+    const p = client.listCities('plumbing', { signal: ac.signal });
+    ac.abort();
+    await expect(p).rejects.toThrow();
+    expect(ac.signal.aborted).toBe(true);
+  });
+
+  it('memoises the trade list and city lists within the TTL', async () => {
+    let now = 0;
+    const sitemapFetch = vi.fn(async () => trades()) as unknown as typeof fetch;
+    const client = new AngiClient({
+      transport: stubTransport({ body: '' }),
+      sitemapFetch,
+      sitemapTtlMs: 1000,
+      now: () => now,
+    });
+    await client.listTrades();
+    await client.listTrades();
+    await client.listCities('plumbing');
+    await client.listCities('plumbing', { state: 'nc' });
+    expect(sitemapFetch).toHaveBeenCalledTimes(2);
+    now = 1001;
+    await client.listTrades();
+    expect(sitemapFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not cache a failure', async () => {
+    const sitemapFetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('', { status: 500 }))
+      .mockResolvedValueOnce(trades()) as unknown as typeof fetch;
+    const client = new AngiClient({ transport: stubTransport({ body: '' }), sitemapFetch });
+    await expect(client.listTrades()).rejects.toThrow(/HTTP 500/);
+    expect(await client.listTrades()).toEqual(['plumbing']);
   });
 });
 

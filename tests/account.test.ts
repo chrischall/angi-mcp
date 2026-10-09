@@ -142,6 +142,17 @@ describe('listMyReviews', () => {
     await expect(new AngiClient({ transport }).listMyReviews()).rejects.toThrow(/sign/i);
   });
 
+  it('reports a Cloudflare challenge as a bot wall, not as signed-out', async () => {
+    // fleet-audit#347: a 2xx challenge interstitial fails JSON.parse; telling the
+    // user to sign in again sends recovery down the wrong path.
+    const transport = stub(() => ({
+      body: '<html><head><title>Just a moment...</title></head><body>_cf_chl_opt</body></html>',
+    }));
+    const err = await new AngiClient({ transport }).listMyReviews().catch((e) => e);
+    expect(String(err.message)).toMatch(/Cloudflare/);
+    expect(String(err.message)).not.toMatch(/sign in/i);
+  });
+
   it('maps 401 to a sign-in error', async () => {
     const transport = stub(() => ({ status: 401, body: '<?xml version="1.0"?><responseStatus/>' }));
     await expect(new AngiClient({ transport }).listMyReviews()).rejects.toThrow(/sign/i);

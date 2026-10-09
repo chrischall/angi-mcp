@@ -19,8 +19,8 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
           .describe('Case-insensitive substring filter, e.g. "duct" or "roof".'),
       }),
     },
-    async ({ contains }) => {
-      let trades = await client.listTrades();
+    async ({ contains }, ctx) => {
+      let trades = await client.listTrades({ signal: ctx.mcpReq.signal });
       if (contains) {
         const needle = contains.toLowerCase();
         trades = trades.filter((t) => t.includes(needle));
@@ -49,8 +49,8 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
           .describe('Case-insensitive substring filter on the city slug.'),
       }),
     },
-    async ({ trade, state, contains }) => {
-      let cities = await client.listCities(trade, { state });
+    async ({ trade, state, contains }, ctx) => {
+      let cities = await client.listCities(trade, { state, signal: ctx.mcpReq.signal });
       if (contains) {
         const needle = contains.toLowerCase();
         cities = cities.filter((c) => c.city.includes(needle));

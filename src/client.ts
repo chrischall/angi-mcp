@@ -193,7 +193,16 @@ export interface AngiClientOptions {
   transport: AngiTransport;
   /** Injectable for tests; defaults to global fetch (used only for sitemaps). */
   sitemapFetch?: typeof fetch;
+  /** Per-request sitemap timeout. Defaults to 15 s. */
+  sitemapTimeoutMs?: number;
+  /** How long a parsed trade / city list is reused. Defaults to 6 h. */
+  sitemapTtlMs?: number;
+  /** Injectable clock for the sitemap cache (tests). */
+  now?: () => number;
 }
+
+const DEFAULT_SITEMAP_TIMEOUT_MS = 15_000;
+const DEFAULT_SITEMAP_TTL_MS = 6 * 60 * 60 * 1000;
 
 export interface SearchArgs {
   trade: string;
@@ -216,10 +225,18 @@ export interface SearchResult {
 export class AngiClient {
   private readonly transport: AngiTransport;
   private readonly sitemapFetch: typeof fetch;
+  private readonly sitemapTimeoutMs: number;
+  private readonly sitemapTtlMs: number;
+  private readonly now: () => number;
+  /** Parsed sitemap results by cache key; failures are never stored. */
+  private readonly sitemapCache = new Map<string, { at: number; value: unknown }>();
 
   constructor(opts: AngiClientOptions) {
     this.transport = opts.transport;
     this.sitemapFetch = opts.sitemapFetch ?? globalThis.fetch;
+    this.sitemapTimeoutMs = opts.sitemapTimeoutMs ?? DEFAULT_SITEMAP_TIMEOUT_MS;
+    this.sitemapTtlMs = opts.sitemapTtlMs ?? DEFAULT_SITEMAP_TTL_MS;
+    this.now = opts.now ?? Date.now;
   }
 
   async start(): Promise<void> {
@@ -307,17 +324,48 @@ export class AngiClient {
     return `${parsed.pathname}${parsed.search}`;
   }
 
+  /** Comparable form of a profile URL or path: decoded pathname, no query. */
+  private static pathKey(urlOrPath: string): string {
+    let pathname: string;
+    try {
+      pathname = new URL(urlOrPath, ORIGIN).pathname;
+    } catch {
+      return urlOrPath;
+    }
+    try {
+      return decodeURIComponent(pathname);
+    } catch {
+      return pathname;
+    }
+  }
+
   async getPro(
     profileUrl: string,
     { compact = false }: { compact?: boolean } = {}
   ): Promise<{ url: string; provider: unknown; reviewCount: number }> {
     const path = AngiClient.toPath(profileUrl);
     const html = await this.fetchHtml(path);
-    const [raw] = recordsFromHtml(html, PROVIDER_KEY, { limit: 1 });
-    if (!raw) {
+    const records = recordsFromHtml(html, PROVIDER_KEY);
+    if (records.length === 0) {
       throw new McpToolError(`No provider record found on ${path}.`, {
         hint: 'The URL may not be a pro profile page, or Angi changed the page shape.',
       });
+    }
+    // The first record on the page is not necessarily the requested pro: a
+    // search page lists many, and a profile can render a sponsored or
+    // "similar pros" card first. Pick the one whose profileUrl is this page.
+    const wanted = AngiClient.pathKey(path);
+    let raw = records.find(
+      (r) => typeof r.profileUrl === 'string' && AngiClient.pathKey(r.profileUrl) === wanted
+    );
+    // A lone record with no profileUrl at all is still the page's provider —
+    // there is nothing it could be confused with.
+    if (!raw && records.length === 1 && records[0].profileUrl === undefined) raw = records[0];
+    if (!raw) {
+      throw new McpToolError(
+        `${path} is not a profile page for one pro — it carries ${records.length} provider record(s), none of them for this URL.`,
+        { hint: 'Pass a profileUrl exactly as angi_search_pros returned it; use angi_search_pros for list pages.' }
+      );
     }
     const reviews = recordsFromHtml(html, REVIEW_KEY);
     const projected = compact ? compactProvider(raw) : null;
@@ -370,20 +418,43 @@ export class AngiClient {
 
   // --- taxonomy: plain fetch, no bridge -------------------------------------
 
-  private async getSitemap(path: string): Promise<string> {
+  /**
+   * Fetch a sitemap with a hard timeout, aborting early if the caller's MCP
+   * request is cancelled — a stalled angi.com would otherwise hold the tool
+   * until undici's 300 s defaults.
+   */
+  private async getSitemap(path: string, signal?: AbortSignal): Promise<string> {
     const url = `${ORIGIN}${path}`;
-    let res: Response;
+    const timeout = AbortSignal.timeout(this.sitemapTimeoutMs);
+    const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
     try {
-      res = await this.sitemapFetch(url);
+      const res = await this.sitemapFetch(url, { signal: combined });
+      if (!res.ok) {
+        throw new UnreachableError(`Angi returned HTTP ${res.status} for ${url}.`);
+      }
+      return await res.text();
     } catch (err) {
+      if (err instanceof UnreachableError) throw err;
+      // The caller cancelled: propagate the abort as-is, not as an outage.
+      if (signal?.aborted) throw err;
+      if (timeout.aborted) {
+        throw new UnreachableError(
+          `Timed out after ${this.sitemapTimeoutMs} ms fetching ${url}.`
+        );
+      }
       throw new UnreachableError(
         `Could not fetch ${url}: ${err instanceof Error ? err.message : String(err)}`
       );
     }
-    if (!res.ok) {
-      throw new UnreachableError(`Angi returned HTTP ${res.status} for ${url}.`);
-    }
-    return res.text();
+  }
+
+  /** Memoise a parsed sitemap result for the TTL; failures are not cached. */
+  private async cachedSitemap<T>(key: string, load: () => Promise<T>): Promise<T> {
+    const hit = this.sitemapCache.get(key);
+    if (hit && this.now() - hit.at < this.sitemapTtlMs) return hit.value as T;
+    const value = await load();
+    this.sitemapCache.set(key, { at: this.now(), value });
+    return value;
   }
 
   private static locs(xml: string): string[] {
@@ -391,36 +462,43 @@ export class AngiClient {
   }
 
   /** Every trade slug Angi publishes (~312). */
-  async listTrades(): Promise<string[]> {
-    const xml = await this.getSitemap('/sitemap/statecat-sitemap.xml');
-    const slugs = new Set<string>();
-    for (const loc of AngiClient.locs(xml)) {
-      const m = loc.match(/\/companylist\/us\/[a-z]{2}\/([^/]+)\.htm/);
-      if (m) slugs.add(m[1]);
-    }
-    return [...slugs].sort();
+  async listTrades({ signal }: { signal?: AbortSignal } = {}): Promise<string[]> {
+    // The statecat sitemap is ~15.8k entries and the tool descriptions steer
+    // agents to call this before every search, so reuse the parsed list.
+    const all = await this.cachedSitemap('trades', async () => {
+      const xml = await this.getSitemap('/sitemap/statecat-sitemap.xml', signal);
+      const slugs = new Set<string>();
+      for (const loc of AngiClient.locs(xml)) {
+        const m = loc.match(/\/companylist\/us\/[a-z]{2}\/([^/]+)\.htm/);
+        if (m) slugs.add(m[1]);
+      }
+      return [...slugs].sort();
+    });
+    return [...all];
   }
 
   /** Every state/city that publishes pages for one trade. */
   async listCities(
     trade: string,
-    { state }: { state?: string } = {}
+    { state, signal }: { state?: string; signal?: AbortSignal } = {}
   ): Promise<{ state: string; city: string }[]> {
     const t = assertSlug(trade, 'trade');
     const wanted = state ? assertState(state) : undefined;
-    const xml = await this.getSitemap(`/sitemap/angi-geocat-${t}.xml`);
-    const seen = new Set<string>();
-    const out: { state: string; city: string }[] = [];
-    for (const loc of AngiClient.locs(xml)) {
-      const m = loc.match(/\/companylist\/us\/([a-z]{2})\/([^/]+)\//);
-      if (!m) continue;
-      if (wanted && m[1] !== wanted) continue;
-      const key = `${m[1]}/${m[2]}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push({ state: m[1], city: m[2] });
-    }
-    return out;
+    const all = await this.cachedSitemap(`cities:${t}`, async () => {
+      const xml = await this.getSitemap(`/sitemap/angi-geocat-${t}.xml`, signal);
+      const seen = new Set<string>();
+      const out: { state: string; city: string }[] = [];
+      for (const loc of AngiClient.locs(xml)) {
+        const m = loc.match(/\/companylist\/us\/([a-z]{2})\/([^/]+)\//);
+        if (!m) continue;
+        const key = `${m[1]}/${m[2]}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push({ state: m[1], city: m[2] });
+      }
+      return out;
+    });
+    return all.filter((c) => !wanted || c.state === wanted).map((c) => ({ ...c }));
   }
 
   // --- signed-in account (my.angi.com) --------------------------------------
@@ -521,6 +599,11 @@ export class AngiClient {
       throw new UnreachableError(
         `Angi returned HTTP ${res.status} for my.angi.com/account/rating-review/reviews.`
       );
+    }
+    // A challenge interstitial is not a sign-out: clearing it in the tab is the
+    // fix, so surface it before the JSON parse turns it into a sign-in error.
+    if (isCloudflareChallenge(res.body)) {
+      throw new BotWallError('/account/rating-review/reviews', undefined, { vendor: 'Cloudflare' });
     }
     let body: { reviews?: unknown[]; unratedPros?: unknown[] };
     try {
