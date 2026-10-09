@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.7](https://github.com/chrischall/angi-mcp/compare/v1.0.6...v1.0.7) (2026-10-09)
+
+
+### Bug Fixes
+
+* **account:** disclose that angi_get_account returns the user's email ([#98](https://github.com/chrischall/angi-mcp/issues/98)) ([e59388c](https://github.com/chrischall/angi-mcp/commit/e59388c4fe0c9daecb7dd9d8822f05ad3d417276))
+* annotate tools truthfully and sync manifests with the served tools ([#100](https://github.com/chrischall/angi-mcp/issues/100)) ([d36a265](https://github.com/chrischall/angi-mcp/commit/d36a2654419efd77d69c70055fdb82c991ab0076))
+* declare the plugin MCP config under the mcpServers key Claude Code reads ([#101](https://github.com/chrischall/angi-mcp/issues/101)) ([394c76c](https://github.com/chrischall/angi-mcp/commit/394c76c759108f297ab0915f86465379bf944a6c))
+* **deps:** update @chrischall/mcp-utils to 3.0.0 ([#99](https://github.com/chrischall/angi-mcp/issues/99)) ([e32fee4](https://github.com/chrischall/angi-mcp/commit/e32fee4a3bcdc66626fc352ebc1a76530836a14b))
+* resolve low-severity audit findings ([#96](https://github.com/chrischall/angi-mcp/issues/96)) ([7110960](https://github.com/chrischall/angi-mcp/commit/7110960dd53d9ef9b2d5af96c3ee92134507ddf3))
+
 ## [1.0.6](https://github.com/chrischall/angi-mcp/compare/v1.0.5...v1.0.6) (2026-10-07)
 
 
