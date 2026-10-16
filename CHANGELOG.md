@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.8](https://github.com/chrischall/angi-mcp/compare/v1.0.7...v1.0.8) (2026-10-16)
+
+
+### Bug Fixes
+
+* **deps:** Bump the production-dependencies group with 3 updates ([#103](https://github.com/chrischall/angi-mcp/issues/103)) ([ff9c093](https://github.com/chrischall/angi-mcp/commit/ff9c093f6f0d347ed437ab9b3bbb2ba5700ccb2d))
+* **parse:** bound record extraction on hostile pages; record tools default to the compact view ([#105](https://github.com/chrischall/angi-mcp/issues/105)) ([43e0203](https://github.com/chrischall/angi-mcp/commit/43e02032ad500b3161ae221648f5b3bac7fc4598))
+
 ## [1.0.7](https://github.com/chrischall/angi-mcp/compare/v1.0.6...v1.0.7) (2026-10-09)
 
 
