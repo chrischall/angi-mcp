@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import type { AngiClient } from '../client.js';
+import { compactAliasArg, viewArg, wantsCompact } from '../view.js';
 
 const profileUrl = z
   .string()
@@ -21,14 +22,12 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
       annotations: toolAnnotations({ title: 'Get Angi pro', idempotent: true, openWorld: true }),
       inputSchema: z.object({
         profileUrl,
-        compact: z
-          .boolean()
-          .optional()
-          .describe('Return a slim summary instead of the full record.'),
+        view: viewArg(),
+        compact: compactAliasArg(),
       }),
     },
-    async ({ profileUrl: url, compact }) =>
-      minifiedResult(await client.getPro(url, { compact }))
+    async ({ profileUrl: url, view, compact }) =>
+      minifiedResult(await client.getPro(url, { compact: wantsCompact({ view, compact }) }))
   );
 
   server.registerTool(
@@ -49,13 +48,11 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
           .optional()
           .describe('Keep reviews rated at most this — use maxRating: 3 to surface complaints.'),
         limit: PositiveInt.optional().describe('Return at most this many reviews.'),
-        compact: z
-          .boolean()
-          .optional()
-          .describe('Return a slim summary per review instead of the full record.'),
+        view: viewArg(),
+        compact: compactAliasArg(),
       }),
     },
-    async ({ profileUrl: url, ...opts }) =>
-      minifiedResult(await client.getReviews(url, opts))
+    async ({ profileUrl: url, view, compact, ...opts }) =>
+      minifiedResult(await client.getReviews(url, { ...opts, compact: wantsCompact({ view, compact }) }))
   );
 }

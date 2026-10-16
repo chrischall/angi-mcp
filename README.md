@@ -72,11 +72,13 @@ Searches take **slugs**, not free text — resolve them first:
 ```
 angi_list_trades   { contains: "duct" }      -> "air-duct-cleaning"
 angi_list_cities   { trade: "plumbing", state: "nc", contains: "char" }
-angi_search_pros   { trade: "plumbing", state: "nc", city: "charlotte", compact: true }
+angi_search_pros   { trade: "plumbing", state: "nc", city: "charlotte" }
 ```
 
-Pass `compact: true` when browsing or ranking — it projects each record to a
-slim summary instead of the full ~1KB payload.
+`angi_search_pros`, `angi_get_pro` and `angi_get_reviews` answer in the slim
+`view: "compact"` projection by default; pass `view: "full"` for Angi's whole
+~1KB records. (The old `compact` boolean still works as a deprecated alias and
+will be removed in a later release.)
 
 ### Ratings
 
