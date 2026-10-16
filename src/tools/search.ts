@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import type { AngiClient } from '../client.js';
+import { compactAliasArg, viewArg, wantsCompact } from '../view.js';
 
 export function registerSearchTools(server: McpServer, client: AngiClient): void {
   server.registerTool(
@@ -22,15 +23,11 @@ export function registerSearchTools(server: McpServer, client: AngiClient): void
         state: z.string().describe('Two-letter US state code, e.g. "nc".'),
         city: z.string().describe('City slug, e.g. "charlotte", "rock-hill".'),
         page: PositiveInt.optional().describe('1-based page number. 10 pros per page.'),
-        compact: z
-          .boolean()
-          .optional()
-          .describe(
-            'Return a slim summary per pro instead of the full record. Recommended when browsing or ranking.'
-          ),
+        view: viewArg(),
+        compact: compactAliasArg(),
       }),
     },
-    async (args) =>
-      minifiedResult(await client.searchPros(args))
+    async ({ view, compact, ...args }) =>
+      minifiedResult(await client.searchPros({ ...args, compact: wantsCompact({ view, compact }) }))
   );
 }

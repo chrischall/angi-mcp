@@ -103,4 +103,35 @@ describe('skill rsc.mjs stays in lockstep with src/parse.ts', () => {
       server.objectsWithKey(text, 'legacyId')
     );
   });
+
+  it('objectsWithKey agrees on hostile and random flight text (fleet-audit#1211)', () => {
+    const texts = [
+      '{'.repeat(20_000) + '"legacyId":1,'.repeat(500),
+      '{"a":'.repeat(3000) + '"legacyId"' + '}'.repeat(3000) + ',"legacyId"'.repeat(500),
+      '{"legacyId":1,"a":'.repeat(2000) + '0' + '}'.repeat(2000),
+      "{'legacyId':1}{\"legacyId\":\"'\"}{\"x\":\"}{\"legacyId\":2}",
+    ];
+    let seed = 11;
+    const rand = (n: number) => ((seed = (seed * 48271) % 2147483647), seed % n);
+    const PIECES = ['{', '}', '[', ']', '"legacyId"', ':', ',', '1', '"s{"', '{"legacyId":3}', '\n', "'"];
+    for (let c = 0; c < 200; c++) {
+      let t = '';
+      for (let k = 0; k < 40; k++) t += PIECES[rand(PIECES.length)];
+      texts.push(t);
+    }
+    for (const text of texts) {
+      expect(skill.objectsWithKey(text, 'legacyId', { resolveRefs: false })).toEqual(
+        server.objectsWithKey(text, 'legacyId', { resolve: false })
+      );
+    }
+  });
+
+  it('the inlined matchBalanced is the mcp-utils one', async () => {
+    const { matchBalanced } = await import('@chrischall/mcp-utils/scrape');
+    for (const text of ['{"a":[1,{"b":"}"}]}x', "{'}':1}", '{[}]', '{"a":', '[1,[2],[3]]', 'x{}', '{"q":"\\"}"}']) {
+      for (let i = 0; i < text.length; i++) {
+        expect(skill.matchBalanced(text, i), `${text}@${i}`).toBe(matchBalanced(text, i));
+      }
+    }
+  });
 });

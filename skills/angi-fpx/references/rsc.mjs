@@ -95,52 +95,107 @@ export function resolve(value, rows, seen = new Set(), depth = 0) {
   return value;
 }
 
-/** Brace-match forward from `start`, which must index a '{' or '['. */
-function matchSpan(s, start) {
-  const open = s[start];
-  const close = open === '{' ? '}' : ']';
-  let depth = 0, inStr = false, esc = false;
-  for (let i = start; i < s.length; i++) {
-    const c = s[i];
-    if (inStr) {
-      if (esc) esc = false;
-      else if (c === '\\') esc = true;
-      else if (c === '"') inStr = false;
+/**
+ * mcp-utils/scrape `matchBalanced`, inlined: the EXCLUSIVE end index of the
+ * `{…}` / `[…]` value starting at `start`, or -1 when `start` is not an opener
+ * or the structure never closes (or closes with the wrong bracket). Aware of
+ * both "…" and '…' strings.
+ */
+export function matchBalanced(text, start) {
+  const opener = text[start];
+  if (opener !== '{' && opener !== '[') return -1;
+  const stack = [];
+  let inString = null;
+  let escape = false;
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (inString) {
+      if (escape) escape = false;
+      else if (ch === '\\') escape = true;
+      else if (ch === inString) inString = null;
       continue;
     }
-    if (c === '"') inStr = true;
-    else if (c === open) depth++;
-    else if (c === close && --depth === 0) return s.slice(start, i + 1);
+    if (ch === '"' || ch === "'") inString = ch;
+    else if (ch === '{' || ch === '[') stack.push(ch);
+    else if (ch === '}' || ch === ']') {
+      const open = stack.pop();
+      if ((ch === '}' && open !== '{') || (ch === ']' && open !== '[')) return -1;
+      if (stack.length === 0) return i + 1;
+    }
   }
-  return null;
+  return -1;
 }
+
+// Bounds mirrored from src/parse.ts (fleet-audit#1211): see objectsWithKey there.
+const MAX_LOOKBACK = 200_000;
+const MAX_CANDIDATES_PER_HIT = 64;
+const SCAN_BUDGET_FACTOR = 64;
+const MIN_SCAN_BUDGET = 1 << 20;
 
 /**
  * Every JSON object in the flight text that owns `key` as a direct property,
- * with references resolved. Walks back from each hit to the nearest enclosing
- * '{' that parses and still contains the key. Undocumented payloads drift, so
- * a candidate that fails to parse is skipped rather than thrown.
+ * with references resolved. From each hit, takes the nearest '{' before it
+ * whose balanced span encloses the hit, parses, and owns the key. Undocumented
+ * payloads drift, so a candidate that fails to parse is skipped rather than
+ * thrown. Linear: a '{' that cannot enclose a later hit is dropped for good,
+ * each '{' is matched and parsed at most once, and total work is budgeted
+ * (the same algorithm as src/parse.ts).
  */
 export function objectsWithKey(text, key, { limit = Infinity, resolveRefs = true } = {}) {
   const rows = resolveRefs ? flightRows(text) : null;
   const needle = `"${key}"`;
-  const seen = new Set();
   const out = [];
+  const braces = [];
+  for (let p = text.indexOf('{'); p !== -1; p = text.indexOf('{', p + 1)) braces.push(p);
+  const prev = Int32Array.from(braces, (_, k) => k);
+  const live = (k) => {
+    let r = k;
+    while (r >= 0 && prev[r] !== r) r = prev[r];
+    while (k > r) {
+      const next = prev[k];
+      prev[k] = r;
+      k = next;
+    }
+    return r;
+  };
+  const UNKNOWN = -2;
+  const ends = new Int32Array(braces.length).fill(UNKNOWN);
+  const parsed = new Array(braces.length);
+  const taken = new Uint8Array(braces.length);
+  let budget = Math.max(SCAN_BUDGET_FACTOR * text.length, MIN_SCAN_BUDGET);
+  let below = 0;
   let from = 0;
-  while (out.length < limit) {
+  scan: while (out.length < limit) {
     const hit = text.indexOf(needle, from);
     if (hit === -1) break;
     from = hit + needle.length;
-    for (let i = hit; i >= 0 && hit - i < 200_000; i--) {
-      if (text[i] !== '{') continue;
-      const span = matchSpan(text, i);
-      if (!span || i + span.length <= hit) continue; // does not enclose the hit
-      let obj;
-      try { obj = JSON.parse(span); } catch { continue; }
+    while (below < braces.length && braces[below] <= hit) below++;
+    let tried = 0;
+    for (let k = live(below - 1); k >= 0; k = live(k - 1)) {
+      const i = braces[k];
+      if (hit - i >= MAX_LOOKBACK) break;
+      let end = ends[k];
+      if (end === UNKNOWN) {
+        end = matchBalanced(text, i);
+        budget -= (end === -1 ? text.length : end) - i;
+        if (budget < 0) break scan;
+        ends[k] = end;
+      }
+      if (end === -1 || end <= hit) {
+        prev[k] = k - 1;
+        continue;
+      }
+      if (++tried > MAX_CANDIDATES_PER_HIT) break;
+      let obj = parsed[k];
+      if (obj === undefined) {
+        budget -= end - i;
+        if (budget < 0) break scan;
+        try { obj = JSON.parse(text.slice(i, end)); } catch { obj = null; }
+        parsed[k] = obj;
+      }
       if (!obj || typeof obj !== 'object' || !(key in obj)) continue;
-      const id = `${i}:${span.length}`;
-      if (!seen.has(id)) {
-        seen.add(id);
+      if (!taken[k]) {
+        taken[k] = 1;
         out.push(rows ? resolve(obj, rows) : obj);
       }
       break;
