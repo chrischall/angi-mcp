@@ -34,3 +34,16 @@ egress:
     # node fetch (src/client.ts getSitemap), 200 with no redirect. The apex
     # angi.com is never dialled — ORIGIN is www.
     - www.angi.com
+examples:
+  - prompt: >-
+      Find the top-rated plumbers on Angi in Charlotte, NC. Compare their
+      ratings, review counts, and years in business.
+    note: Resolves the trade and city slugs, then searches pros.
+  - prompt: >-
+      Show me the low-rated reviews for this Angi roofer and summarize the
+      common complaints and how the company responded.
+    note: Reads a pro's reviews, filtered to 3 stars or below.
+  - prompt: >-
+      What does this Angi pro's profile say about their service area, hours,
+      and the tasks they offer?
+    note: Reads one pro's full public profile.
