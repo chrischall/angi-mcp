@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.9](https://github.com/chrischall/angi-mcp/compare/v1.0.8...v1.0.9) (2026-10-20)
+
+
+### Documentation
+
+* **mint:** add sample prompts for the public catalog ([#110](https://github.com/chrischall/angi-mcp/issues/110)) ([f14468f](https://github.com/chrischall/angi-mcp/commit/f14468f70f8a09dd1015bd4043a528b7030b6f16))
+* **mint:** fit the catalog summary within 200 characters ([#112](https://github.com/chrischall/angi-mcp/issues/112)) ([cdf3edb](https://github.com/chrischall/angi-mcp/commit/cdf3edbd8882d2f21612babd7d681ce6cc74538f))
+
 ## [1.0.8](https://github.com/chrischall/angi-mcp/compare/v1.0.7...v1.0.8) (2026-10-16)
 
 
