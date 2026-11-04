@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import type { AngiClient } from '../client.js';
+import { homeMeta } from './hints.js';
 import { compactAliasArg, viewArg, wantsCompact } from '../view.js';
 
 export function registerSearchTools(server: McpServer, client: AngiClient): void {
@@ -16,6 +17,9 @@ export function registerSearchTools(server: McpServer, client: AngiClient): void
         'and angi_list_cities first. 10 pros per page; use `page` to walk further. ' +
         'Note Angi has no zip-code filter: location comes from the city slug only.',
       annotations: toolAnnotations({ title: 'Search Angi pros', idempotent: true, openWorld: true }),
+      _meta: homeMeta('lookup', {
+        aliases: ['contractor', 'plumber', 'electrician', 'handyman', 'roofer', 'home repair', 'find a pro', 'hire someone'],
+      }),
       inputSchema: z.object({
         trade: z
           .string()

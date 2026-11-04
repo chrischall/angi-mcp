@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import type { AngiClient } from '../client.js';
+import { homeMeta } from './hints.js';
 
 export function registerTaxonomyTools(server: McpServer, client: AngiClient): void {
   server.registerTool(
@@ -12,6 +13,7 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
         '"basement-waterproofing"). Call this to resolve a free-text trade to the slug ' +
         'angi_search_pros needs. Reads Angi\'s public sitemap directly — no browser bridge required.',
       annotations: toolAnnotations({ title: 'List Angi trades', idempotent: true, openWorld: true }),
+      _meta: homeMeta('lookup', { aliases: ['trades', 'kinds of work', 'services'] }),
       inputSchema: z.object({
         contains: z
           .string()
@@ -37,6 +39,7 @@ export function registerTaxonomyTools(server: McpServer, client: AngiClient): vo
         'confirm a city slug exists before searching, or to discover nearby cities. ' +
         'Reads Angi\'s public sitemap directly — no browser bridge required.',
       annotations: toolAnnotations({ title: 'List Angi cities', idempotent: true, openWorld: true }),
+      _meta: homeMeta('lookup', { aliases: ['cities', 'towns angi covers'] }),
       inputSchema: z.object({
         trade: z.string().describe('Trade slug, e.g. "plumbing".'),
         state: z

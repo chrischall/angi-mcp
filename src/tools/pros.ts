@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { PositiveInt, minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import type { AngiClient } from '../client.js';
+import { homeMeta } from './hints.js';
 import { compactAliasArg, viewArg, wantsCompact } from '../view.js';
 
 const profileUrl = z
@@ -20,6 +21,7 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
         'awards, tasks offered, contact address, and the ratings breakdown. Also reports how ' +
         'many reviews the page carries (fetch them with angi_get_reviews).',
       annotations: toolAnnotations({ title: 'Get Angi pro', idempotent: true, openWorld: true }),
+      _meta: homeMeta('lookup', { aliases: ['contractor', 'pro profile', 'business hours', 'service area'] }),
       inputSchema: z.object({
         profileUrl,
         view: viewArg(),
@@ -38,6 +40,7 @@ export function registerProTools(server: McpServer, client: AngiClient): void {
         'date, service categories, verification flag, and the pro\'s public response where one ' +
         'exists. Filter by rating to isolate complaints or praise.',
       annotations: toolAnnotations({ title: 'Get Angi reviews', idempotent: true, openWorld: true }),
+      _meta: homeMeta('lookup', { aliases: ['reviews', 'ratings', 'complaints', 'what people say'] }),
       inputSchema: z.object({
         profileUrl,
         minRating: z.number().min(1).max(5).optional().describe('Keep reviews rated at least this.'),
