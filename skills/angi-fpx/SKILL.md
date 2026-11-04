@@ -123,6 +123,21 @@ Two limits, both verified:
 Signed-out requests are **redirected to `/auth/login`** rather than 401'd, so a
 200 that contains a login page means the tab is signed out.
 
+## In context groups
+
+When angi-mcp runs on a host that groups tools by context (mcp-host), its
+tools sit in the **home** group, beside the other home-services, real-estate
+and smart-home servers. Every Angi tool is a **lookup** — finding a pro,
+reading a profile or its reviews, the trade/city lists, and the signed-in
+account, projects and reviews. Angi answers no "what's new", "what's due" or
+"what's on" question, so it has **no canonical read and no subject**: a
+compound ask such as "anything new at home, and find me a plumber in
+Charlotte?" is answered by the group's other members for the first half and
+by `angi_search_pros` for the second. Angi is browser-bridged, so when the
+ContextMint Bridge is not connected (or no `www.angi.com` tab is open) the
+group answers that Angi **needs your browser open** rather than failing the
+whole ask.
+
 ## Gotchas
 
 - `?page=N` paginates (10 unique pros per page, no overlap between pages).

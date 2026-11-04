@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult, toolAnnotations } from '@chrischall/mcp-utils';
 import type { AngiClient } from '../client.js';
+import { homeMeta } from './hints.js';
 
 /**
  * Signed-in account tools (my.angi.com).
@@ -22,6 +23,7 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
         'count, and how many open and closed projects they have. Requires the browser tab to be ' +
         'signed in.',
       annotations: toolAnnotations({ title: 'Get Angi account', idempotent: true, openWorld: true }),
+      _meta: homeMeta('lookup', { aliases: ['my angi account', 'angi messages'] }),
       inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.getAccount())
@@ -40,6 +42,7 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
         idempotent: true,
         openWorld: true,
       }),
+      _meta: homeMeta('lookup', { aliases: ['my projects', 'my angi jobs', 'service requests', 'bookings'] }),
       inputSchema: z.object({
         status: z
           .enum(['open', 'closed', 'all'])
@@ -63,6 +66,7 @@ export function registerAccountTools(server: McpServer, client: AngiClient): voi
         idempotent: true,
         openWorld: true,
       }),
+      _meta: homeMeta('lookup', { aliases: ['my reviews', 'pros to rate'] }),
       inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.listMyReviews())
