@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.1.0](https://github.com/chrischall/angi-mcp/compare/v1.0.8...v1.1.0) (2026-11-04)
+
+
+### Features
+
+* context-group hints ([#116](https://github.com/chrischall/angi-mcp/issues/116)) ([820a3f8](https://github.com/chrischall/angi-mcp/commit/820a3f86022ec93e15602bab3c3a6733efc1b53a))
+
+
+### Bug Fixes
+
+* **deps:** Bump the production-dependencies group across 1 directory with 2 updates ([#115](https://github.com/chrischall/angi-mcp/issues/115)) ([76b0c8a](https://github.com/chrischall/angi-mcp/commit/76b0c8abd68e2c412f81c022a071346ad64d6680))
+* **deps:** Bump the production-dependencies group with 2 updates ([#113](https://github.com/chrischall/angi-mcp/issues/113)) ([458ed1d](https://github.com/chrischall/angi-mcp/commit/458ed1d0f5cf7cbdf1083016ded8c8e594e3ec1d))
+
+
+### Documentation
+
+* **mint:** add sample prompts for the public catalog ([#110](https://github.com/chrischall/angi-mcp/issues/110)) ([f14468f](https://github.com/chrischall/angi-mcp/commit/f14468f70f8a09dd1015bd4043a528b7030b6f16))
+* **mint:** fit the catalog summary within 200 characters ([#112](https://github.com/chrischall/angi-mcp/issues/112)) ([cdf3edb](https://github.com/chrischall/angi-mcp/commit/cdf3edbd8882d2f21612babd7d681ce6cc74538f))
+
 ## [1.0.8](https://github.com/chrischall/angi-mcp/compare/v1.0.7...v1.0.8) (2026-10-16)
 
 
