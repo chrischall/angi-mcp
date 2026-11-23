@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/chrischall/angi-mcp/compare/v1.1.0...v1.1.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **deps:** Bump @chrischall/mcp-utils from 3.4.0 to 3.4.1 in the production-dependencies group ([#118](https://github.com/chrischall/angi-mcp/issues/118)) ([81ce3aa](https://github.com/chrischall/angi-mcp/commit/81ce3aa2c7d2d5d04f301f1192f83f037c88bdac))
+* **deps:** Bump the production-dependencies group with 2 updates ([#120](https://github.com/chrischall/angi-mcp/issues/120)) ([95fb771](https://github.com/chrischall/angi-mcp/commit/95fb7713e96d850c55c2de27a1dad4d5a78f20f5))
+
 ## [1.1.0](https://github.com/chrischall/angi-mcp/compare/v1.0.8...v1.1.0) (2026-11-04)
 
 
